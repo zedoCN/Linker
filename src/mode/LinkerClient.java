@@ -42,8 +42,9 @@ public class LinkerClient {
     HashMap<UUID, ProxyChannel> proxyChannelUUIDMap = new HashMap<>();
 
     ByteBuffer packetsByteBuffer;//用于记录剩余的数据包数据
-
-    public LinkerClient(String host, int port) {
+    String username;
+    public LinkerClient(String host, int port,String username) {
+        this.username=username;
         //System.out.println("客户端初始化");
 
         new Thread(() -> {
@@ -187,7 +188,7 @@ public class LinkerClient {
             byteBufAllocator = ctx.alloc();
             //System.out.println("Linker客户端 申请身份");
             channel = ctx.channel();
-            sendPack(new InitPack("zedoCN"));
+            sendPack(new InitPack(username));
 
 
         }
