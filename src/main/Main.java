@@ -9,10 +9,22 @@ import java.util.UUID;
 public class Main {
 
     public static void main(String[] args) throws InterruptedException {
-        Scanner scanner=new Scanner(System.in);
-        new Thread(() -> {
-            LinkerServer server = new LinkerServer(8866);//6666
-        }).start();
+        switch (args[0]) {
+            case "-s" -> {
+                Server.main(args);
+            }
+            case "-uc" -> {
+                RunClient.main(args);
+            }
+            case "-hc" -> {
+                RunHostClient.main(args);
+            }
+            case "-h" -> {
+                System.out.println("-s [port] 启动服务器\n-uc [LinkerIP] [LinkerPort] [userName] [serverIP] [serverPort] [groupUUID] 启动用户客户端\n-hc [LinkerIP] [LinkerPort] [userName] [usePort] [groupName] 启动主机客户端\n-h 帮助");
+            }
+        }
+        //Scanner scanner = new Scanner(System.in);
+
        /* Thread.sleep(1000);
         LinkerClient client1 = new LinkerClient();
         Thread.sleep(1000);

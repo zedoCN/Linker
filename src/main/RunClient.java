@@ -6,9 +6,8 @@ import java.util.Scanner;
 
 public class RunClient {
     public static void main(String[] args) throws InterruptedException {
-        Scanner scanner=new Scanner(System.in);
-        LinkerClient client2 = new LinkerClient("zedo.top",8866,"zedoCN");
+        LinkerClient client2 = new LinkerClient(args[1], Integer.parseInt(args[2]), "", args[3]);
         Thread.sleep(1000);
-        client2.joinGroup(scanner.nextLine(), 8888);
+        client2.joinGroup(args[5], Integer.parseInt(args[4]));
     }
 }

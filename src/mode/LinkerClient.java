@@ -12,6 +12,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.util.AttributeKey;
 import io.netty.util.CharsetUtil;
 import main.Main;
@@ -26,14 +27,14 @@ import java.util.Set;
 import java.util.UUID;
 
 public class LinkerClient {
-    EventLoopGroup group = new NioEventLoopGroup();
+     EventLoopGroup group = new NioEventLoopGroup();
     Bootstrap clientBootstrap = new Bootstrap();
     ChannelFuture channelFuture;
     Channel channel;
     ByteBufAllocator byteBufAllocator;
 
-    LinkerUser linkerUser;
-    LinkerGroup linkerGroup;
+    public LinkerUser linkerUser;
+    public LinkerGroup linkerGroup;
 
     ProxyClient proxyClient;
     ProxyServer proxyServer;
@@ -43,9 +44,12 @@ public class LinkerClient {
 
     ByteBuffer packetsByteBuffer;//用于记录剩余的数据包数据
     String username;
-    public LinkerClient(String host, int port,String username) {
-        this.username=username;
-        //System.out.println("客户端初始化");
+    String ip;
+
+    public LinkerClient(String host, int port, String ip, String username) {
+        this.ip = ip;
+        this.username = username;
+        System.out.println("客户端初始化");
 
         new Thread(() -> {
             try {
@@ -55,7 +59,8 @@ public class LinkerClient {
                         .handler(new ChannelInitializer<SocketChannel>() {
                             @Override
                             protected void initChannel(SocketChannel ch) throws Exception {
-                                ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(40960, 0, 4, -4, 0));
+                                ch.pipeline().addLast(new ReadTimeoutHandler(30)); // 设置读取超时时间为30秒
+                                ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(131128, 0, 4, -4, 0));
                                 ch.pipeline().addLast(new ClientHandler());
                             }
                         });
@@ -91,13 +96,14 @@ public class LinkerClient {
         //System.out.println(channel);
         //System.out.println(channel.isWritable());
         //ByteBufferHexPrinter.printByteBufferAsHex(basePack.buildData(byteBufAllocator).nioBuffer());
+        //System.out.println(channel);
         channel.writeAndFlush(basePack.buildData(byteBufAllocator));
     }
 
     public void createGroup(String name, int port) {
         sendPack(new EventPack(EventType.GROUP_CREAT, linkerUser, name));
 
-        proxyClient = new ProxyClient(port, new ProxyInterface() { //启动代理客户
+        proxyClient = new ProxyClient(ip, port, new ProxyInterface() { //启动代理客户
             @Override
             public void getData(Channel channel, ByteBuffer buffer) {
                 //System.out.println("[" + linkerUser.name + "]Linker客户端 收到目标服务器数据" + channel);
@@ -186,7 +192,7 @@ public class LinkerClient {
         @Override
         public void channelActive(ChannelHandlerContext ctx) throws Exception {
             byteBufAllocator = ctx.alloc();
-            //System.out.println("Linker客户端 申请身份");
+            System.out.println("Linker客户端 申请身份");
             channel = ctx.channel();
             sendPack(new InitPack(username));
 
@@ -195,7 +201,7 @@ public class LinkerClient {
 
         @Override
         public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
-            //System.out.println("Linker客户端 断开服务器连接");
+            System.out.println("Linker客户端 断开服务器连接");
         }
 
         @Override
@@ -259,10 +265,10 @@ public class LinkerClient {
                 }
 
             } else if (pack instanceof MessagePack messagePack) {
-                //System.out.println("[" + linkerUser.name + "]Linker客户端 消息： " + messagePack.getMessage());
+                System.out.println("[" + linkerUser.name + "]Linker客户端 消息： " + messagePack.getMessage());
             } else if (pack instanceof UserPack userPack) {
                 linkerUser = userPack.getUser();
-                //System.out.println("[" + linkerUser.name + "]Linker客户端 获得身份");
+                System.out.println("[" + linkerUser.name + "]Linker客户端 获得身份");
             } else if (pack instanceof GroupPack groupPack) {
                 linkerGroup = groupPack.group;
 

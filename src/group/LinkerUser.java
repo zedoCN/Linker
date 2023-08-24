@@ -23,7 +23,7 @@ public class LinkerUser {
     }
 
     public void sendPack(BasePack pack) {
-        System.out.println("   Linker服务器 发送包:" + pack);
+        //System.out.println("   Linker服务器 发送包:" + pack);
         channel.writeAndFlush(pack.buildData(channel.alloc()));
     }
 

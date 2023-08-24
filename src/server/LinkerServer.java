@@ -11,6 +11,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.util.CharsetUtil;
 import mode.LinkerClient;
 import util.ByteBufferHexPrinter;
@@ -43,7 +44,8 @@ public class LinkerServer {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
                             //添加客户端通道的处理器
-                            ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(40960, 0, 4, -4, 0));
+                            ch.pipeline().addLast(new ReadTimeoutHandler(30)); // 设置读取超时时间为30秒
+                            ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(131128, 0, 4, -4, 0));
                             ch.pipeline().addLast(new ServerHandler());
                         }
                     });
@@ -152,11 +154,12 @@ public class LinkerServer {
                 }
             } else if (pack instanceof DataPack dataPack) {
                 if (user.equals(user.group.host)) {//来自主机的数据包 发送给对应的用户
-                    System.out.println("   Linker服务器 转发数据包: 主机 -> 用户");
+                    //System.out.println("   Linker服务器 转发数据包: 主机 -> 用户");
                     ProxyChannel proxyChannel = user.group.proxyChannels.get(dataPack.uuid);
-                    proxyChannel.from.sendPack(dataPack);
+                    if (proxyChannel != null)
+                        proxyChannel.from.sendPack(dataPack);
                 } else {//来自用户的数据包 发送给主机
-                    System.out.println("   Linker服务器 转发数据包: 用户 -> 主机");
+                    //System.out.println("   Linker服务器 转发数据包: 用户 -> 主机");
                     user.group.host.sendPack(dataPack);
                 }
             }

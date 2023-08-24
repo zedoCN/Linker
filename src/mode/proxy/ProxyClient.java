@@ -11,6 +11,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.util.AttributeKey;
 import io.netty.util.CharsetUtil;
 
@@ -23,16 +24,19 @@ public class ProxyClient {
     Bootstrap clientBootstrap = new Bootstrap();
     ProxyInterface proxyInterface;
     int port;
+    String ip;
 
-    public ProxyClient(int port, ProxyInterface proxyInterface) {
+    public ProxyClient(String ip, int port, ProxyInterface proxyInterface) {
         this.port = port;
         this.proxyInterface = proxyInterface;
+        this.ip = ip;
         ////System.out.println("       代理客户 初始化");
 
         clientBootstrap.group(group)
                 .channel(NioSocketChannel.class)
                 //长连接
                 .option(ChannelOption.SO_KEEPALIVE, true)
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 30000)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
@@ -44,7 +48,7 @@ public class ProxyClient {
 
 
     public ChannelFuture creatChannel() {
-        ChannelFuture channelFuture = clientBootstrap.connect("192.168.1.120", port);
+        ChannelFuture channelFuture = clientBootstrap.connect(ip, port);
         return channelFuture;
 
     }
