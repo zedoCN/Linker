@@ -29,7 +29,7 @@ public class LinkerServer {
     ByteBuffer packetsByteBuffer;//用于记录剩余的数据包数据
 
 
-    public LinkerServer() {
+    public LinkerServer(int port) {
         System.out.println("   Linker服务器初始化");
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -47,7 +47,7 @@ public class LinkerServer {
                             ch.pipeline().addLast(new ServerHandler());
                         }
                     });
-            serverBootstrap.bind(6666).sync().channel().closeFuture().sync();
+            serverBootstrap.bind(port).sync().channel().closeFuture().sync();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {

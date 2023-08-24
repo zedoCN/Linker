@@ -43,7 +43,7 @@ public class LinkerClient {
 
     ByteBuffer packetsByteBuffer;//用于记录剩余的数据包数据
 
-    public LinkerClient() {
+    public LinkerClient(String host, int port) {
         //System.out.println("客户端初始化");
 
         new Thread(() -> {
@@ -59,7 +59,7 @@ public class LinkerClient {
                             }
                         });
 
-                channelFuture = clientBootstrap.connect("192.168.1.120", 6666).awaitUninterruptibly();
+                channelFuture = clientBootstrap.connect(host, port).awaitUninterruptibly();
 
                 if (channelFuture.isSuccess()) {
                     //System.out.println("[" + linkerUser.name + "]Linker客户端 服务器连接成功");
