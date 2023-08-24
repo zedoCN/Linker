@@ -44,7 +44,6 @@ public class LinkerServer {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
                             //添加客户端通道的处理器
-                            ch.pipeline().addLast(new ReadTimeoutHandler(30)); // 设置读取超时时间为30秒
                             ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(131128, 0, 4, -4, 0));
                             ch.pipeline().addLast(new ServerHandler());
                         }

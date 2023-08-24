@@ -8,9 +8,11 @@ public class Xiang {
         while (true){
             try {
                 Thread.sleep(500);
-                LinkerClient client1 = new LinkerClient("192.168.1.120", 8432, "", "zedoCN");
+                LinkerClient client1 = new LinkerClient("zedo.top", 5432, "", "xiang");
                 Thread.sleep(500);
                 client1.createGroup("yigezu", 2157);
+
+                client1.channelFuture.channel().closeFuture().await();
             }catch (Exception e){
                 e.printStackTrace();
                 System.out.println("崩了，自动重启。");

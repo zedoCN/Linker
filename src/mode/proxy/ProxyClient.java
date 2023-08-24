@@ -50,7 +50,6 @@ public class ProxyClient {
     public ChannelFuture creatChannel() {
         ChannelFuture channelFuture = clientBootstrap.connect(ip, port);
         return channelFuture;
-
     }
 
     private class ClientHandler extends ChannelHandlerAdapter {

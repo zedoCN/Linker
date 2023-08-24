@@ -27,9 +27,9 @@ import java.util.Set;
 import java.util.UUID;
 
 public class LinkerClient {
-     EventLoopGroup group = new NioEventLoopGroup();
+    EventLoopGroup group = new NioEventLoopGroup();
     Bootstrap clientBootstrap = new Bootstrap();
-    ChannelFuture channelFuture;
+    public ChannelFuture channelFuture;
     Channel channel;
     ByteBufAllocator byteBufAllocator;
 
@@ -51,37 +51,20 @@ public class LinkerClient {
         this.username = username;
         System.out.println("客户端初始化");
 
-        new Thread(() -> {
-            try {
-                clientBootstrap.group(group)
-                        .channel(NioSocketChannel.class)
-                        .option(ChannelOption.SO_KEEPALIVE, true)
-                        .handler(new ChannelInitializer<SocketChannel>() {
-                            @Override
-                            protected void initChannel(SocketChannel ch) throws Exception {
-                                ch.pipeline().addLast(new ReadTimeoutHandler(30)); // 设置读取超时时间为30秒
-                                ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(131128, 0, 4, -4, 0));
-                                ch.pipeline().addLast(new ClientHandler());
-                            }
-                        });
+        clientBootstrap.group(group)
+                .channel(NioSocketChannel.class)
+                .option(ChannelOption.SO_KEEPALIVE, true)
+                .handler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    protected void initChannel(SocketChannel ch) throws Exception {
+                        ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(131128, 0, 4, -4, 0));
+                        ch.pipeline().addLast(new ClientHandler());
+                    }
+                });
 
-                channelFuture = clientBootstrap.connect(host, port).awaitUninterruptibly();
+        channelFuture = clientBootstrap.connect(host, port).awaitUninterruptibly();
 
-                if (channelFuture.isSuccess()) {
-                    //System.out.println("[" + linkerUser.name + "]Linker客户端 服务器连接成功");
-                } else {
-                    throw new RuntimeException("连接失败");
-                }
-            } finally {
-                // 关闭连接前，先等待连接关闭
-                if (channelFuture != null) {
-                    channelFuture.channel().closeFuture().syncUninterruptibly();
-                }
 
-                // 关闭事件循环组
-                group.shutdownGracefully();
-            }
-        }).start();
     }
 
     public static void sendProxy(Channel channel, ByteBuffer buffer) {
@@ -196,6 +179,11 @@ public class LinkerClient {
             channel = ctx.channel();
             sendPack(new InitPack(username));
 
+
+        }
+
+        @Override
+        public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
 
         }
 
