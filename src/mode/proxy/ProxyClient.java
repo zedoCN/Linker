@@ -36,7 +36,7 @@ public class ProxyClient {
                 .channel(NioSocketChannel.class)
                 //长连接
                 .option(ChannelOption.SO_KEEPALIVE, true)
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 30000)
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 60000)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {

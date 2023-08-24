@@ -10,10 +10,7 @@ public class Test {
         }).start();
 
 
-        Thread.sleep(500);
-        LinkerClient client2 = new LinkerClient("192.168.1.120", 5432, "", "zedoCN");
-        Thread.sleep(500);
-        client2.createGroup("dsads",8888);
+
 
 
     }

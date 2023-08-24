@@ -26,8 +26,7 @@ public class ProxyServer {
                 serverBootstrap.group(bossGroup, workerGroup)
                         .channel(NioServerSocketChannel.class)
                         .option(ChannelOption.SO_KEEPALIVE, true)
-                        .option(ChannelOption.SO_TIMEOUT,30000)
-                        .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 30000)
+                        .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 60000)
                         .childHandler(new ChannelInitializer<SocketChannel>() {
                             @Override
                             protected void initChannel(SocketChannel ch) throws Exception {
