@@ -264,8 +264,8 @@ public class LinkerServer {
         if (user.equals(user.group.host)) {//如果是主机
             dissolveGroup(user.group);
         } else {
+            user.group.users.remove(user);
             user.group.sendPack(new EventPack(EventType.GROUP_LEAVE, user, ""));
-            user.group.sendPack(new EventPack(EventType.GROUP_DISSOLVE, user, ""));
         }
         System.out.println("   Linker服务器 离开组:" + user);
         user.group.sendPack(new MessagePack("离开组:" + user));

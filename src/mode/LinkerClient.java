@@ -77,6 +77,17 @@ public class LinkerClient {
         channel.writeAndFlush(basePack.buildData(byteBufAllocator));
     }
 
+    public void leave() {
+        // 关闭连接
+        try {
+            channel.close().sync();
+            // 优雅地关闭资源
+            group.shutdownGracefully().sync();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void getGroups() {
         sendPack(new EventPack(EventType.GET_GROUPS, linkerUser, ""));
     }

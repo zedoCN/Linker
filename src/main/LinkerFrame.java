@@ -28,6 +28,8 @@ public class LinkerFrame extends JFrame {
     public Properties properties = new Properties();
     LinkerClient linkerClient;
     JSONArray groupsJsonArray;
+    DefaultListModel<String> model = new DefaultListModel<>();
+    DefaultListModel<String> members = new DefaultListModel<>();
 
     public void saveProperties() {
         try {
@@ -93,7 +95,7 @@ public class LinkerFrame extends JFrame {
         list.setMinimumSize(new Dimension(80, 100));
 
         leftSide.add(list);
-        DefaultListModel<String> model = new DefaultListModel<>();
+
         list.setModel(model);
 
         //下边俩按钮
@@ -177,7 +179,7 @@ public class LinkerFrame extends JFrame {
         //三级菜单标题
         thirdMenu.add(getLabel("zedo组中"));
         //三级菜单成员列表
-        DefaultListModel<String> members = new DefaultListModel<>();
+
         JList<String> membersList = new JList<>(members);
         membersList.setPreferredSize(new Dimension(80, 100));
         membersList.setMinimumSize(new Dimension(80, 100));
@@ -185,6 +187,9 @@ public class LinkerFrame extends JFrame {
         //三级菜单离开按钮
         JButton leaveButton = getButton("离开");
         leaveButton.addActionListener(e -> {
+            linkerClient.leave();
+            initLinkerClient();
+
             //离开按钮事件
             setContentPane(secondaryMenu);
             repaint();
@@ -193,17 +198,19 @@ public class LinkerFrame extends JFrame {
         thirdMenu.add(leaveButton);
 
         joinButton.addActionListener(e -> {
-            properties.put("userPort", userPortField.getText());
-            saveProperties();
-            JSONObject group = groupsJsonArray.getJSONObject(list.getSelectedIndex());
-            linkerClient.joinGroup(group.getString("uuid"), Integer.parseInt(properties.getProperty("userPort")));
+            if (list.getSelectedIndex() >= 0 && list.getSelectedIndex() < groupsJsonArray.size()) {
+                properties.put("userPort", userPortField.getText());
+                saveProperties();
+                JSONObject group = groupsJsonArray.getJSONObject(list.getSelectedIndex());
+                linkerClient.joinGroup(group.getString("uuid"), Integer.parseInt(properties.getProperty("userPort")));
             /*linkerClient.createGroup(properties.getProperty("groupName"),
                     Integer.parseInt(properties.getProperty("hostPort")));*/
 
-            //二级菜单加入按钮事件
-            setContentPane(thirdMenu);
-            repaint();
-            validate();
+                //二级菜单加入按钮事件
+                setContentPane(thirdMenu);
+                repaint();
+                validate();
+            }
         });
         creatGroup.addActionListener(e -> {
             //二级菜单创建组按钮事件
@@ -233,47 +240,51 @@ public class LinkerFrame extends JFrame {
             System.out.println("连接Linker服务器");
             properties.setProperty("Name", inputNameField.getText());
             saveProperties();
-            linkerClient = new LinkerClient(properties.getProperty("LinkerServerIp"),
-                    Integer.parseInt(properties.getProperty("LinkerServerPort")),
-                    properties.getProperty("Name"), eventPack -> {
-
-                switch (eventPack.getType()) {
-                    case USER_GET_IDENTITY -> {
-                        System.out.println(eventPack.getParameterJSON());
-                        setTitle("Linker 连接成功:" + eventPack.getParameterJSON().getString("name"));
-                        linkerClient.getGroups();
-                    }
-                    case GET_GROUPS -> {
-                        groupsJsonArray = eventPack.getParameterJSON().getJSONArray("groups");
-                        model.clear();
-                        if (groupsJsonArray.size() > 0) {
-                            for (int i = 0; i < groupsJsonArray.size(); i++) {
-                                JSONObject group = groupsJsonArray.getJSONObject(i);
-                                model.add(i, group.getString("name") + "   [" + group.getString("hostName") + "]   共:" + group.getIntValue("users") + "人");
-                            }
-                        } else {
-                            model.add(0, "          暂无组        ");
-                        }
-
-                    }
-                    case GROUP_JOIN, GROUP_LEAVE -> {
-                        linkerClient.getGroupMembers();
-                    }
-                    case USER_GET_GROUP_MEMBER -> {
-                        members.clear();
-                        JSONArray membersJSON = eventPack.getParameterJSON().getJSONArray("members");
-                        for (int i = 0; i < membersJSON.size(); i++) {
-                            JSONObject member = membersJSON.getJSONObject(i);
-                            members.add(i, (i == 0 ? "[主机]" : "") + "       " + member.getString("name") + "      ");
-                        }
-                    }
-                }
-
-
-            });
+            initLinkerClient();
         });
 
 
+    }
+
+    public void initLinkerClient() {
+        linkerClient = new LinkerClient(properties.getProperty("LinkerServerIp"),
+                Integer.parseInt(properties.getProperty("LinkerServerPort")),
+                properties.getProperty("Name"), eventPack -> {
+
+            switch (eventPack.getType()) {
+                case USER_GET_IDENTITY -> {
+                    System.out.println(eventPack.getParameterJSON());
+                    setTitle("Linker 连接成功:" + eventPack.getParameterJSON().getString("name"));
+                    linkerClient.getGroups();
+                }
+                case GET_GROUPS -> {
+                    groupsJsonArray = eventPack.getParameterJSON().getJSONArray("groups");
+                    model.clear();
+                    if (groupsJsonArray.size() > 0) {
+                        for (int i = 0; i < groupsJsonArray.size(); i++) {
+                            JSONObject group = groupsJsonArray.getJSONObject(i);
+                            model.add(i, group.getString("name") + "   [" + group.getString("hostName") + "]   共:" + group.getIntValue("users") + "人");
+                        }
+                    } else {
+                        model.add(0, "          暂无组        ");
+                    }
+
+                }
+                case GROUP_JOIN, GROUP_LEAVE -> {
+                    linkerClient.getGroupMembers();
+                }
+                case USER_GET_GROUP_MEMBER -> {
+                    members.clear();
+                    JSONArray membersJSON = eventPack.getParameterJSON().getJSONArray("members");
+                    for (int i = 0; i < membersJSON.size(); i++) {
+                        JSONObject member = membersJSON.getJSONObject(i);
+                        members.add(i, (i == 0 ? "[主机]" : "") + "       " + member.getString("name") + "      ");
+                    }
+                }
+            }
+
+
+        });
     }
 
     /*private Dimension getStringDim(String str){
