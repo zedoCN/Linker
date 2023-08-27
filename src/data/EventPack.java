@@ -1,5 +1,6 @@
 package data;
 
+import com.alibaba.fastjson2.JSONObject;
 import group.LinkerUser;
 
 import java.nio.ByteBuffer;
@@ -29,6 +30,10 @@ public class EventPack extends JSONPack {
         return data.getString("parameter");
     }
 
+    public JSONObject getParameterJSON() {
+        return data.getJSONObject("parameterJSON");
+    }
+
     public EventPack(ByteBuffer buffer) {
         super(buffer);
     }
@@ -39,6 +44,15 @@ public class EventPack extends JSONPack {
         if (user.group != null)
             data.put("sourceGroup", user.group.uuid);
         data.put("parameter", parameter);
+    }
+
+    public EventPack(EventType eventType, LinkerUser user, String parameter, JSONObject parameterJSON) {
+        data.put("eventType", eventType.name());
+        data.put("sourceUser", user.uuid);
+        if (user.group != null)
+            data.put("sourceGroup", user.group.uuid);
+        data.put("parameter", parameter);
+        data.put("parameterJSON", parameterJSON);
     }
 
     @Override

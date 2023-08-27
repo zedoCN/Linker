@@ -12,18 +12,12 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import io.netty.handler.timeout.ReadTimeoutHandler;
-import io.netty.util.AttributeKey;
-import io.netty.util.CharsetUtil;
-import main.Main;
 import mode.proxy.ProxyClient;
 import mode.proxy.ProxyInterface;
 import mode.proxy.ProxyServer;
-import util.ByteBufferHexPrinter;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.UUID;
 
 public class LinkerClient {
@@ -44,10 +38,10 @@ public class LinkerClient {
 
     ByteBuffer packetsByteBuffer;//用于记录剩余的数据包数据
     String username;
-    String ip;
+    EventPackInterface eventPackInterface;
 
-    public LinkerClient(String host, int port, String ip, String username) {
-        this.ip = ip;
+    public LinkerClient(String host, int port, String username, EventPackInterface eventPackInterface) {
+        this.eventPackInterface = eventPackInterface;
         this.username = username;
         System.out.println("客户端初始化");
 
@@ -83,10 +77,18 @@ public class LinkerClient {
         channel.writeAndFlush(basePack.buildData(byteBufAllocator));
     }
 
+    public void getGroups() {
+        sendPack(new EventPack(EventType.GET_GROUPS, linkerUser, ""));
+    }
+
+    public void getGroupMembers() {
+        sendPack(new EventPack(EventType.USER_GET_GROUP_MEMBER, linkerUser, ""));
+    }
+
     public void createGroup(String name, int port) {
         sendPack(new EventPack(EventType.GROUP_CREAT, linkerUser, name));
 
-        proxyClient = new ProxyClient(ip, port, new ProxyInterface() { //启动代理客户
+        proxyClient = new ProxyClient("", port, new ProxyInterface() { //启动代理客户
             @Override
             public void getData(Channel channel, ByteBuffer buffer) {
                 //System.out.println("[" + linkerUser.name + "]Linker客户端 收到目标服务器数据" + channel);
@@ -211,6 +213,8 @@ public class LinkerClient {
                 return;
             }
             if (pack instanceof EventPack eventPack) {
+                eventPackInterface.event(eventPack);
+                //System.out.println("Linker客户端 收到数据" + ctx.channel() + " " + pack);
                 switch (eventPack.getType()) {
                     case GROUP_LEAVE -> {
                         //System.out.println(eventPack.getSourceUser() + "离开了组");
@@ -291,9 +295,13 @@ public class LinkerClient {
 
 
         @Override
-        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
             cause.printStackTrace();
             ctx.close();
         }
+    }
+
+    public interface EventPackInterface {
+        void event(EventPack eventPack);
     }
 }

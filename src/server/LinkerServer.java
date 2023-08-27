@@ -1,5 +1,7 @@
 package server;
 
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import data.*;
 import group.LinkerGroup;
 import group.LinkerUser;
@@ -93,6 +95,7 @@ public class LinkerServer {
                 user.enable = true;
                 user.name = initPack.getName();
                 user.sendPack(new UserPack(user));
+                user.sendPack(new EventPack(EventType.USER_GET_IDENTITY, user, "", GroupPack.getUserJSON(user)));
             } else if (pack instanceof EventPack eventPack) {
                 switch (eventPack.getType()) {
                     case GROUP_CREAT -> {
@@ -118,7 +121,18 @@ public class LinkerServer {
                         }
                     }
                     case GET_GROUPS -> {
-                        user.sendPack(new MessagePack(groupUUIDMap.toString()));
+                        JSONArray jsonArray = new JSONArray();
+                        for (LinkerGroup group : groupUUIDMap.values()) {
+                            JSONObject jsonObject = new JSONObject();
+                            jsonObject.put("name", group.name);
+                            jsonObject.put("hostName", group.host.name);
+                            jsonObject.put("users", group.users.size() + 1);
+                            jsonObject.put("uuid", group.uuid);
+                            jsonArray.add(jsonObject);
+                        }
+                        JSONObject rootJSON = new JSONObject();
+                        rootJSON.put("groups", jsonArray);
+                        user.sendPack(new EventPack(EventType.GET_GROUPS, user, "", rootJSON));
                     }
                     case CHANNEL_CONNECT -> {
                         if (user.equals(user.group.host)) {//消息来自主机
@@ -149,6 +163,16 @@ public class LinkerServer {
                             }
 
                         }
+                    }
+                    case USER_GET_GROUP_MEMBER -> {
+                        JSONArray members = new JSONArray();
+                        members.add(GroupPack.getUserJSON(user.group.host));
+                        for (LinkerUser user1 : user.group.users) {
+                            members.add(GroupPack.getUserJSON(user1));
+                        }
+                        JSONObject member = new JSONObject();
+                        member.put("members", members);
+                        user.sendPack(new EventPack(EventType.USER_GET_GROUP_MEMBER, user, "", member));
                     }
                 }
             } else if (pack instanceof DataPack dataPack) {
@@ -216,6 +240,7 @@ public class LinkerServer {
         groupUserMap.put(host, group);
         groupUUIDMap.put(group.uuid, group);
         System.out.println("   Linker服务器 创建组:" + group);
+        host.group.sendPack(new MessagePack("创建组:" + group));
     }
 
     public void dissolveGroup(LinkerGroup group) {
@@ -232,6 +257,7 @@ public class LinkerServer {
         user.group.users.add(user);
         user.group.sendPack(new EventPack(EventType.GROUP_JOIN, user, ""));
         System.out.println("   Linker服务器 加入组:" + user);
+        user.group.sendPack(new MessagePack("加入组:" + user));
     }
 
     public void leaveGroup(LinkerUser user) {
@@ -242,5 +268,6 @@ public class LinkerServer {
             user.group.sendPack(new EventPack(EventType.GROUP_DISSOLVE, user, ""));
         }
         System.out.println("   Linker服务器 离开组:" + user);
+        user.group.sendPack(new MessagePack("离开组:" + user));
     }
 }

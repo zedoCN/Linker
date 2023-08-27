@@ -8,6 +8,8 @@ public enum EventType {
     GET_GROUPS(""),
     CHANNEL_CONNECT(""),
     CHANNEL_DISCONNECT(""),
+    USER_GET_IDENTITY(""),
+    USER_GET_GROUP_MEMBER(""),
     ;
     final public String info;
 

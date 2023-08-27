@@ -16,7 +16,9 @@ public class LinkerGroup {
 
 
     public void sendPack(BasePack pack) {
-
+        host.sendPack(pack);
+        for (LinkerUser user : users)
+            user.sendPack(pack);
     }
 
     @Override
