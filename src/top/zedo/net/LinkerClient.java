@@ -10,9 +10,12 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import top.zedo.LinkerLogger;
-import top.zedo.net.data.BasePacket;
-import top.zedo.net.data.ChannelPacket;
-import top.zedo.net.data.JsonPacket;
+import top.zedo.data.LinkerCommand;
+import top.zedo.data.LinkerEvent;
+import top.zedo.data.LinkerUser;
+import top.zedo.net.packet.BasePacket;
+import top.zedo.net.packet.ChannelPacket;
+import top.zedo.net.packet.JsonPacket;
 import top.zedo.util.HexPrinter;
 
 import java.net.InetSocketAddress;
@@ -21,10 +24,16 @@ public class LinkerClient {
     EventLoopGroup group = new NioEventLoopGroup();
     Bootstrap clientBootstrap = new Bootstrap();
     InetSocketAddress LinkerServerAddress;
-
     Channel linkerServerChannel;
+    LinkerUser linkerUser;
+    LinkerClientEvent linkerClientEvent;
 
-    public LinkerClient() {
+    public LinkerUser getLinkerUser() {
+        return linkerUser;
+    }
+
+    public LinkerClient(LinkerClientEvent linkerClientEvent) {
+        this.linkerClientEvent = linkerClientEvent;
         clientBootstrap.group(group)
                 .channel(NioSocketChannel.class)
                 .option(ChannelOption.SO_KEEPALIVE, true)
@@ -49,46 +58,122 @@ public class LinkerClient {
     }
 
     /**
+     * 修改昵称
+     *
+     * @param name 新昵称
+     */
+    public void changeName(String name) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("newName", name);
+        sendPacket(JsonPacket.buildCommandPacket(jsonObject, LinkerCommand.CHANGE_NAME));
+    }
+
+
+    /**
      * 向服务器发送数据包
      *
      * @param packet 数据包
      */
     private void sendPacket(BasePacket packet) {
         ByteBuf nettyByteBuf = Unpooled.wrappedBuffer(packet.buildPack());
-        HexPrinter.printHex( nettyByteBuf.nioBuffer());
         linkerServerChannel.writeAndFlush(nettyByteBuf);
+    }
+
+    /**
+     * 处理事件
+     *
+     * @param event 事件类型
+     * @param value 事件附加信息
+     */
+    private void handleEvent(LinkerEvent event, JSONObject value) {
+        switch (event) {
+            case USER_GET_START -> {
+                linkerUser = LinkerUser.build(value);
+            }
+            case USER_LOGIN -> {
+                LinkerLogger.info("连接成功");
+                linkerUser = LinkerUser.build(value);
+            }
+        }
+        linkerClientEvent.handleEvent(linkerUser, event, value);
+    }
+
+    /**
+     * 处理命令
+     *
+     * @param command 命令类型
+     * @param value   命令附加信息
+     */
+    private void handleCommand(LinkerCommand command, JSONObject value) {
+        switch (command) {
+
+            case PING -> {
+                value.put("acceptTime", System.currentTimeMillis());
+                sendPacket(JsonPacket.buildCommandPacket(value, command));
+            }
+        }
     }
 
     private class ClientHandler extends ChannelHandlerAdapter {
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+            cause.printStackTrace();
             LinkerLogger.warning("连接异常" + cause.getMessage());
         }
 
         @Override
         public void channelActive(ChannelHandlerContext ctx) throws Exception {
             LinkerLogger.info("连接" + ctx.channel());
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("你好", "WDNSM");
-            System.out.println(new JsonPacket(jsonObject).buildPack());
-            sendPacket(new JsonPacket(jsonObject));
+
+            /*JSONObject jsonObject = new JSONObject();
+
+            sendPacket(JsonPacket.buildCommandPacket(jsonObject, LinkerCommand.LOGIN));*/
         }
 
         @Override
         public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+            linkerClientEvent.handleEvent(linkerUser, LinkerEvent.USER_LEAVE, null);
             LinkerLogger.info("连接断开" + ctx.channel());
         }
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            ByteBuf data = (ByteBuf) msg;
-            BasePacket packet = BasePacket.resolved(data.nioBuffer());
+            BasePacket packet = BasePacket.resolved(((ByteBuf) msg).nioBuffer());
             if (packet instanceof ChannelPacket channelPacket) {
 
             } else if (packet instanceof JsonPacket jsonPacket) {
-                LinkerLogger.info("接受json包" + jsonPacket);
+                JSONObject data = jsonPacket.getJsonObject();
+                switch (data.getString("type")) {
+                    case "event" -> {
+                        LinkerEvent event;
+                        try {
+                            event = LinkerEvent.valueOf(data.getString("name"));
+                        } catch (IllegalArgumentException e) {
+                            LinkerLogger.warning("未知事件: " + e);
+                            return;
+                        }
+                        handleEvent(event, data.getJSONObject("value"));
+                    }
+                    case "command" -> {
+                        LinkerCommand command;
+                        try {
+                            command = LinkerCommand.valueOf(data.getString("name"));
+                        } catch (IllegalArgumentException e) {
+                            LinkerLogger.warning("未知命令: " + e);
+                            return;
+                        }
+                        handleCommand(command, data.getJSONObject("value"));
+                    }
+                    default -> {
+                        LinkerLogger.warning("未知类型: " + data.getString("type"));
+                    }
+                }
 
             }
         }
+    }
+
+    public interface LinkerClientEvent {
+        void handleEvent(LinkerUser linkerUser, LinkerEvent event, JSONObject object);
     }
 }

@@ -1,4 +1,4 @@
-package top.zedo.net.data;
+package top.zedo.net.packet;
 
 import java.nio.ByteBuffer;
 import java.util.UUID;

@@ -1,4 +1,4 @@
-package top.zedo.net.data;
+package top.zedo.net.packet;
 
 public enum PacketType {
     CHANNEL((byte) 0),
