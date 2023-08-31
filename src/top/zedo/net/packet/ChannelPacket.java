@@ -9,10 +9,10 @@ public class ChannelPacket extends BasePacket {
     public UUID uuid;//连接通道的uuid
     public ByteBuffer sourceData;//源数据
 
-    public ChannelPacket(UUID fromUser, UUID toUser, UUID uuid, ByteBuffer sourceData) {
+    public ChannelPacket(UUID fromUser, UUID toUser, UUID channelUUID, ByteBuffer sourceData) {
         this.fromUser = fromUser;
         this.toUser = toUser;
-        this.uuid = uuid;
+        this.uuid = channelUUID;
         this.sourceData = sourceData;
     }
 
@@ -38,7 +38,14 @@ public class ChannelPacket extends BasePacket {
         uuid = new UUID(uuidMostSignificantBits, uuidLeastSignificantBits);
 
         // Read sourceData
-        sourceData = packData.slice();
+
+
+        // Calculate the size of the data
+
+        sourceData = ByteBuffer.allocate(packData.remaining());
+        sourceData.put(packData);
+        sourceData.flip();
+        //sourceData = packData.slice();
     }
 
     @Override
@@ -64,6 +71,7 @@ public class ChannelPacket extends BasePacket {
         // Write uuid
         buffer.putLong(uuid.getMostSignificantBits());
         buffer.putLong(uuid.getLeastSignificantBits());
+        buffer.put(sourceData);
     }
 
     @Override

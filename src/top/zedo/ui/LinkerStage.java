@@ -1,6 +1,8 @@
 package top.zedo.ui;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -15,6 +17,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import top.zedo.LinkerLogger;
+import top.zedo.data.LinkerCommand;
 import top.zedo.net.LinkerClient;
 import top.zedo.util.ByteFormatter;
 
@@ -37,9 +40,9 @@ public class LinkerStage extends Stage {
         }
     }
 
-    TextField nameTextField = new TextField();
+    LabelTextField nameTextField = new LabelTextField("昵称:");
 
-    private void saveProperties() {
+    protected void saveProperties() {
         try {
             LinkerLogger.info("保存配置");
             properties.store(new FileWriter("./Linker.cfg", StandardCharsets.UTF_8), "Linker");
@@ -48,14 +51,8 @@ public class LinkerStage extends Stage {
         }
     }
 
-    {
 
-        nameTextField.setPromptText("你的昵称");
-    }
-
-    Button nameButton = new Button("修改");
-
-    HBox header = new HBox(nameTextField, nameButton);
+    HBox header = new HBox(nameTextField);
 
     {
         header.setAlignment(Pos.CENTER_LEFT);
@@ -63,8 +60,9 @@ public class LinkerStage extends Stage {
         header.setPadding(new Insets(8));
     }
 
-    OneBox oneBox = new OneBox();
-    VBox body = new VBox(oneBox);
+    OneBox oneBox = new OneBox(this);
+    TwoBox twoBox = new TwoBox(this);
+    VBox body = new VBox();
 
     {
         VBox.setVgrow(body, Priority.ALWAYS);
@@ -89,20 +87,35 @@ public class LinkerStage extends Stage {
 
     VBox root = new VBox(header, body, footer);
     Scene scene = new Scene(root);
-    LinkerClient linkerClient;
+    public LinkerClient linkerClient;
 
+    public void setLinkerTitle(String title) {
+        Platform.runLater(()->{
+            setTitle("Linker " + title);
+        });
+    }
 
     public LinkerStage() {
         /*setMaxWidth(600);
         setMaxHeight(400);*/
-        setMinWidth(600);
+        setMinWidth(800);
         setMinHeight(400);
-        setWidth(600);
+        setWidth(800);
         setHeight(400);
         setScene(scene);
 
+        nameTextField.textField.setText(properties.getProperty("Name"));
+        nameTextField.textField.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
+                properties.put("Name", nameTextField.textField.getText());
+                saveProperties();
+                linkerClient.changeName(nameTextField.textField.getText());
+            }
+        });
 
         linkerClient = new LinkerClient((user, event, object) -> {
+            oneBox.handleEvent.handleEvent(user, event, object);
+            twoBox.handleEvent.handleEvent(user, event, object);
             switch (event) {
                 case USER_GET_START -> {
                     Platform.runLater(() -> {
@@ -114,12 +127,67 @@ public class LinkerStage extends Stage {
                     });
                 }
                 case USER_LOGIN -> {
-                    linkerClient.changeName(nameTextField.getText());
+                    linkerClient.changeName(nameTextField.textField.getText());
+                    setLinkerTitle("登录成功");
+                }
+                case USER_JOIN_GROUP -> {
+                    setLinkerTitle("加入到组");
+                }
+                case HOST_DISSOLVE_GROUP -> {
+                    setLinkerTitle("主机解散了组");
+                }
+                case USER_LEAVE -> {
+                    setLinkerTitle("用户离开");
+                }
+                case COMMAND_SUCCESS -> {
+                    switch (LinkerCommand.valueOf(object.getString("command"))) {
+                        case JOIN_GROUP -> {
+                            if (object.getBooleanValue("success")) {
+                                changePane(false);
+                                linkerClient.proxyNetwork.setMode(false);
+                                linkerClient.proxyNetwork.start(Integer.parseInt(properties.getProperty("userPort")));
+                                setLinkerTitle("成功加入组");
+                            } else {
+                                setLinkerTitle("无法加入组:"+ object.getString("message"));
+                                LinkerLogger.warning("无法加入组:" + object.getString("message"));
+                            }
+                        }
+                        case CREATE_GROUP -> {
+                            if (object.getBooleanValue("success")) {
+                                changePane(false);
+                                linkerClient.proxyNetwork.setMode(true);
+                                linkerClient.proxyNetwork.start(Integer.parseInt(properties.getProperty("hostPort")));
+                                setLinkerTitle("成功创建组");
+                            } else {
+                                setLinkerTitle("无法创建组:"+ object.getString("message"));
+                                LinkerLogger.warning("无法创建组:" + object.getString("message"));
+                            }
+                        }
+                    }
                 }
             }
         });
 
-        linkerClient.setLinkerServerAddress(new InetSocketAddress("", 5432));
+
+        linkerClient.setLinkerServerAddress(new InetSocketAddress(properties.getProperty("LinkerServerIp"), Integer.parseInt(properties.getProperty("LinkerServerPort"))));
         linkerClient.connect();
+
+        changePane(true);
+    }
+
+    /**
+     * 变更面板
+     *
+     * @param isOne 是第一个
+     */
+    public void changePane(boolean isOne) {
+        Platform.runLater(() -> {
+            body.getChildren().clear();
+            if (isOne) {
+                body.getChildren().add(oneBox);
+            } else {
+                body.getChildren().add(twoBox);
+            }
+        });
     }
 }

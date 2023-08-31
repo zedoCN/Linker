@@ -6,11 +6,12 @@ import com.alibaba.fastjson2.annotation.JSONField;
 import com.alibaba.fastjson2.annotation.JSONType;
 
 import java.util.UUID;
-@JSONType(ignores = {"UUID"})
+
+@JSONType(ignores = {"UUID", "group"})
 public class LinkerUser {
     public String name;//用户名称
     private UUID uuid;//用户uuid
-    public LinkerGroup group;//加入的组uuid
+    public LinkerGroup group;//加入的组
     public int delay = 0; // 延迟
     public String ipAddress = "未知"; // IP 地址
     public long loginTime = 0; // 登录时间
@@ -56,16 +57,26 @@ public class LinkerUser {
                 '}';
     }
 
-    public LinkerUser(String name) {
-        this.name = name;
-        setUUID(UUID.randomUUID());
-        group = null;
-    }
 
     public LinkerUser() {
         name = null;
-        setUUID(UUID.randomUUID());
         group = null;
+    }
+
+    /**
+     * 是否在组里
+     */
+    public boolean isInGroup() {
+        return group != null;
+    }
+
+    /**
+     * 是否是主机
+     */
+    public boolean isHost() {
+        if (!isInGroup())
+            return false;
+        return group.host.getUUID().equals(uuid);
     }
 
     public static LinkerUser build(JSONObject jsonObject) {

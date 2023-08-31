@@ -8,4 +8,8 @@ public enum LinkerEvent {
     HOST_DISSOLVE_GROUP,//主机解散组
     GROUP_GET_MESSAGES,//在群里获得消息
     USER_GET_START,//用户获得状态
+    USER_GET_GROUPS,//用户获得组列表
+    GROUP_UPDATE,//组更新
+    CHANNEL_CLOSE,//通道断开
+    COMMAND_SUCCESS,//命令执行成功
 }

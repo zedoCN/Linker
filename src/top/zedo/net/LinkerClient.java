@@ -12,25 +12,26 @@ import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import top.zedo.LinkerLogger;
 import top.zedo.data.LinkerCommand;
 import top.zedo.data.LinkerEvent;
+import top.zedo.data.LinkerGroup;
 import top.zedo.data.LinkerUser;
 import top.zedo.net.packet.BasePacket;
 import top.zedo.net.packet.ChannelPacket;
 import top.zedo.net.packet.JsonPacket;
-import top.zedo.util.HexPrinter;
+import top.zedo.net.proxy.ProxyNetwork;
 
 import java.net.InetSocketAddress;
+import java.util.UUID;
 
 public class LinkerClient {
     EventLoopGroup group = new NioEventLoopGroup();
     Bootstrap clientBootstrap = new Bootstrap();
     InetSocketAddress LinkerServerAddress;
     Channel linkerServerChannel;
-    LinkerUser linkerUser;
+    public LinkerUser linkerUser;
+    public LinkerGroup linkerGroup;
     LinkerClientEvent linkerClientEvent;
+    public ProxyNetwork proxyNetwork = new ProxyNetwork(this);
 
-    public LinkerUser getLinkerUser() {
-        return linkerUser;
-    }
 
     public LinkerClient(LinkerClientEvent linkerClientEvent) {
         this.linkerClientEvent = linkerClientEvent;
@@ -64,17 +65,85 @@ public class LinkerClient {
      */
     public void changeName(String name) {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("newName", name);
+        jsonObject.put("name", name);
         sendPacket(JsonPacket.buildCommandPacket(jsonObject, LinkerCommand.CHANGE_NAME));
     }
 
+    /**
+     * 创建组
+     *
+     * @param group 组名
+     */
+    public void createGroup(String group) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("name", group);
+        sendPacket(JsonPacket.buildCommandPacket(jsonObject, LinkerCommand.CREATE_GROUP));
+    }
+
+    /**
+     * 加入组
+     *
+     * @param uuid 组uuid
+     */
+    public void joinGroup(String uuid) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("uuid", uuid);
+        sendPacket(JsonPacket.buildCommandPacket(jsonObject, LinkerCommand.JOIN_GROUP));
+    }
+
+    /**
+     * 发送群消息
+     *
+     * @param message 消息
+     */
+    public void sendGroupMessage(String message) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("message", message);
+        sendPacket(JsonPacket.buildCommandPacket(jsonObject, LinkerCommand.SEND_GROUP_MESSAGE));
+    }
+
+
+    /**
+     * 获得群列表
+     */
+    public void getGroups() {
+        sendPacket(JsonPacket.buildCommandPacket(null, LinkerCommand.GET_GROUPS));
+    }
+
+    /**
+     * 离开组
+     */
+    public void leaveGroup() {
+        sendPacket(JsonPacket.buildCommandPacket(null, LinkerCommand.LEAVE_GROUP));
+    }
+
+    /**
+     * 发送通道包
+     *
+     * @param packet 包
+     */
+    public void sendChannelPacket(ChannelPacket packet) {
+        sendPacket(packet);
+    }
+
+    /**
+     * 发送通道关闭事件
+     *
+     * @param channelUUID 通道uuid
+     */
+    public void sendChannelClose(UUID channelUUID,UUID to) {
+        JSONObject json = new JSONObject();
+        json.put("uuid", channelUUID.toString());
+        json.put("to", to.toString());
+        sendPacket(JsonPacket.buildEventPacket(json, LinkerEvent.CHANNEL_CLOSE));
+    }
 
     /**
      * 向服务器发送数据包
      *
      * @param packet 数据包
      */
-    private void sendPacket(BasePacket packet) {
+    protected void sendPacket(BasePacket packet) {
         ByteBuf nettyByteBuf = Unpooled.wrappedBuffer(packet.buildPack());
         linkerServerChannel.writeAndFlush(nettyByteBuf);
     }
@@ -94,9 +163,17 @@ public class LinkerClient {
                 LinkerLogger.info("连接成功");
                 linkerUser = LinkerUser.build(value);
             }
+            case CHANNEL_CLOSE -> {
+                proxyNetwork.closeChannel(UUID.fromString(value.getString("uuid")));
+                LinkerLogger.info("事件: 断开连接" + value);
+            }
+            case GROUP_UPDATE -> {
+                linkerGroup = LinkerGroup.build(value);
+            }
         }
         linkerClientEvent.handleEvent(linkerUser, event, value);
     }
+
 
     /**
      * 处理命令
@@ -111,6 +188,7 @@ public class LinkerClient {
                 value.put("acceptTime", System.currentTimeMillis());
                 sendPacket(JsonPacket.buildCommandPacket(value, command));
             }
+
         }
     }
 
@@ -139,8 +217,10 @@ public class LinkerClient {
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
             BasePacket packet = BasePacket.resolved(((ByteBuf) msg).nioBuffer());
-            if (packet instanceof ChannelPacket channelPacket) {
+            ((ByteBuf) msg).release();//释放
 
+            if (packet instanceof ChannelPacket channelPacket) {
+                proxyNetwork.handleChannelPacket(channelPacket);
             } else if (packet instanceof JsonPacket jsonPacket) {
                 JSONObject data = jsonPacket.getJsonObject();
                 switch (data.getString("type")) {
@@ -150,7 +230,7 @@ public class LinkerClient {
                             event = LinkerEvent.valueOf(data.getString("name"));
                         } catch (IllegalArgumentException e) {
                             LinkerLogger.warning("未知事件: " + e);
-                            return;
+                            break;
                         }
                         handleEvent(event, data.getJSONObject("value"));
                     }
@@ -160,7 +240,7 @@ public class LinkerClient {
                             command = LinkerCommand.valueOf(data.getString("name"));
                         } catch (IllegalArgumentException e) {
                             LinkerLogger.warning("未知命令: " + e);
-                            return;
+                            break;
                         }
                         handleCommand(command, data.getJSONObject("value"));
                     }
@@ -170,6 +250,7 @@ public class LinkerClient {
                 }
 
             }
+            //((ByteBuf) msg).release();//释放
         }
     }
 
