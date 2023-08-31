@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -193,6 +194,8 @@ public class TwoBox extends VBox {
     Button leaveButton = new Button("离开组");
 
     {
+        setSpacing(8);
+        setPadding(new Insets(8));
         VBox.setVgrow(this, Priority.ALWAYS);
         VBox.setVgrow(tableView, Priority.ALWAYS);
         leaveButton.setMaxWidth(Double.MAX_VALUE);

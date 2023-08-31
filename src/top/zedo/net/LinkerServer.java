@@ -231,7 +231,7 @@ public class LinkerServer {
                 LinkerLogger.warning("未知目标用户" + packet);
                 return;
             }
-            LinkerLogger.info("来源:" + user + " 转发数据包" + packet);
+            //LinkerLogger.info("来源:" + user + " 转发数据包" + packet);
             sendPacket(to, packet);//转发数据包
         }
     }

@@ -54,8 +54,9 @@ public class LinkerClient {
     /**
      * 连接到Linker服务器
      */
-    public void connect() {
+    public boolean connect() {
         linkerServerChannel = clientBootstrap.connect(LinkerServerAddress).awaitUninterruptibly().channel();
+        return linkerServerChannel.isActive();
     }
 
     /**
@@ -131,7 +132,7 @@ public class LinkerClient {
      *
      * @param channelUUID 通道uuid
      */
-    public void sendChannelClose(UUID channelUUID,UUID to) {
+    public void sendChannelClose(UUID channelUUID, UUID to) {
         JSONObject json = new JSONObject();
         json.put("uuid", channelUUID.toString());
         json.put("to", to.toString());
@@ -144,8 +145,13 @@ public class LinkerClient {
      * @param packet 数据包
      */
     protected void sendPacket(BasePacket packet) {
-        ByteBuf nettyByteBuf = Unpooled.wrappedBuffer(packet.buildPack());
-        linkerServerChannel.writeAndFlush(nettyByteBuf);
+        if (linkerServerChannel!=null) {
+            if (linkerServerChannel.isActive()) {
+                ByteBuf nettyByteBuf = Unpooled.wrappedBuffer(packet.buildPack());
+                linkerServerChannel.writeAndFlush(nettyByteBuf);
+            }
+        }
+
     }
 
     /**

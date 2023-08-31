@@ -13,5 +13,6 @@
     <orderEntry type="library" name="openjfx.javafx.base" level="project" />
     <orderEntry type="library" name="openjfx.javafx.graphics" level="project" />
     <orderEntry type="library" name="openjfx.javafx.controls" level="project" />
+    <orderEntry type="library" name="Concentus-1.0-SNAPSHOT" level="project" />
   </component>
 </module>

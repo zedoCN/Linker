@@ -163,11 +163,11 @@ public class OneBox extends VBox {
 
     {
         leftBox.setSpacing(8);
-        leftBox.setPadding(new Insets(5));
+        //leftBox.setPadding(new Insets(8));
         leftBox.setAlignment(Pos.BOTTOM_CENTER);
 
         rightBox.setSpacing(8);
-        rightBox.setPadding(new Insets(5));
+        //rightBox.setPadding(new Insets(8));
         rightBox.setAlignment(Pos.BOTTOM_CENTER);
 
         HBox.setHgrow(leftBox, Priority.ALWAYS);
@@ -179,13 +179,17 @@ public class OneBox extends VBox {
 
 
     {
+        setSpacing(8);
+        bottom.setSpacing(8);
+        setPadding(new Insets(8));
+
         tableView.setPrefWidth(Region.USE_COMPUTED_SIZE);
         tableView.setPrefHeight(Region.USE_COMPUTED_SIZE);
         VBox.setVgrow(tableView, Priority.ALWAYS);
         VBox.setVgrow(this, Priority.ALWAYS);
 
         getChildren().addAll(tableView, bottom);
-        bottom.setPadding(new Insets(8));
+        //bottom.setPadding(new Insets(8));
     }
 
     public OneBox(LinkerStage stage) {

@@ -1,20 +1,13 @@
 package top.zedo.ui;
 
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import top.zedo.LinkerLogger;
 import top.zedo.data.LinkerCommand;
@@ -40,7 +33,7 @@ public class LinkerStage extends Stage {
         }
     }
 
-    LabelTextField nameTextField = new LabelTextField("昵称:");
+    LabelTextField nameTextField = new LabelTextField("你的昵称:");
 
     protected void saveProperties() {
         try {
@@ -90,7 +83,7 @@ public class LinkerStage extends Stage {
     public LinkerClient linkerClient;
 
     public void setLinkerTitle(String title) {
-        Platform.runLater(()->{
+        Platform.runLater(() -> {
             setTitle("Linker " + title);
         });
     }
@@ -104,10 +97,10 @@ public class LinkerStage extends Stage {
         setHeight(400);
         setScene(scene);
 
-        nameTextField.textField.setText(properties.getProperty("Name"));
+        nameTextField.textField.setText(properties.getProperty("name"));
         nameTextField.textField.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue) {
-                properties.put("Name", nameTextField.textField.getText());
+                properties.put("name", nameTextField.textField.getText());
                 saveProperties();
                 linkerClient.changeName(nameTextField.textField.getText());
             }
@@ -133,11 +126,14 @@ public class LinkerStage extends Stage {
                 case USER_JOIN_GROUP -> {
                     setLinkerTitle("加入到组");
                 }
+                case USER_LEAVE_GROUP -> {
+                    setLinkerTitle("用户离开组");
+                }
                 case HOST_DISSOLVE_GROUP -> {
                     setLinkerTitle("主机解散了组");
                 }
                 case USER_LEAVE -> {
-                    setLinkerTitle("用户离开");
+                    reconnect();
                 }
                 case COMMAND_SUCCESS -> {
                     switch (LinkerCommand.valueOf(object.getString("command"))) {
@@ -148,7 +144,7 @@ public class LinkerStage extends Stage {
                                 linkerClient.proxyNetwork.start(Integer.parseInt(properties.getProperty("userPort")));
                                 setLinkerTitle("成功加入组");
                             } else {
-                                setLinkerTitle("无法加入组:"+ object.getString("message"));
+                                setLinkerTitle("无法加入组:" + object.getString("message"));
                                 LinkerLogger.warning("无法加入组:" + object.getString("message"));
                             }
                         }
@@ -159,7 +155,7 @@ public class LinkerStage extends Stage {
                                 linkerClient.proxyNetwork.start(Integer.parseInt(properties.getProperty("hostPort")));
                                 setLinkerTitle("成功创建组");
                             } else {
-                                setLinkerTitle("无法创建组:"+ object.getString("message"));
+                                setLinkerTitle("无法创建组:" + object.getString("message"));
                                 LinkerLogger.warning("无法创建组:" + object.getString("message"));
                             }
                         }
@@ -169,10 +165,44 @@ public class LinkerStage extends Stage {
         });
 
 
-        linkerClient.setLinkerServerAddress(new InetSocketAddress(properties.getProperty("LinkerServerIp"), Integer.parseInt(properties.getProperty("LinkerServerPort"))));
-        linkerClient.connect();
+        linkerClient.setLinkerServerAddress(new InetSocketAddress(properties.getProperty("linkerServerIp"), Integer.parseInt(properties.getProperty("linkerServerPort"))));
+
+        new Thread(() -> {
+            setLinkerTitle("正在连接Linker服务器");
+            if (linkerClient.connect()) {
+                setLinkerTitle("连接成功");
+                return;
+            }
+            reconnect();
+        }).start();
 
         changePane(true);
+    }
+
+    private void reconnect() {
+        changePane(true);
+        new Thread(() -> {
+            while (true) {
+                for (int i = 5; i > 0; i--) {
+                    setLinkerTitle("掉线重连  " + i + "s 后尝试重连");
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ignored) {
+                    }
+                }
+                setLinkerTitle("正在尝试连接...");
+                if (linkerClient.connect()) {
+                    setLinkerTitle("重连成功");
+                    return;
+                }
+                setLinkerTitle("重连失败");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ignored) {
+                }
+            }
+
+        }).start();
     }
 
     /**
