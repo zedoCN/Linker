@@ -1,6 +1,7 @@
 package top.zedo.ui;
 
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -9,6 +10,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import top.zedo.LinkerLogger;
 import top.zedo.data.LinkerCommand;
 import top.zedo.net.LinkerClient;
@@ -96,6 +98,8 @@ public class LinkerStage extends Stage {
         setWidth(800);
         setHeight(400);
         setScene(scene);
+
+        setOnCloseRequest(event -> System.exit(0));
 
         nameTextField.textField.setText(properties.getProperty("name"));
         nameTextField.textField.focusedProperty().addListener((observable, oldValue, newValue) -> {
