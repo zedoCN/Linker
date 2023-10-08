@@ -145,7 +145,7 @@ public class LinkerClient {
      * @param packet 数据包
      */
     protected void sendPacket(BasePacket packet) {
-        if (linkerServerChannel!=null) {
+        if (linkerServerChannel != null) {
             if (linkerServerChannel.isActive()) {
                 ByteBuf nettyByteBuf = Unpooled.wrappedBuffer(packet.buildPack());
                 linkerServerChannel.writeAndFlush(nettyByteBuf);

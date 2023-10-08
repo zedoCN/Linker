@@ -157,6 +157,7 @@ public class LinkerStage extends Stage {
                                 changePane(false);
                                 linkerClient.proxyNetwork.setMode(true);
                                 linkerClient.proxyNetwork.start(Integer.parseInt(properties.getProperty("hostPort")));
+                                linkerClient.proxyNetwork.setIp(properties.getProperty("hostIp"));
                                 setLinkerTitle("成功创建组");
                             } else {
                                 setLinkerTitle("无法创建组:" + object.getString("message"));

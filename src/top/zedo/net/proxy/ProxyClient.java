@@ -19,11 +19,14 @@ public class ProxyClient {
     Bootstrap clientBootstrap = new Bootstrap();
     LinkerClient linkerClient;
     ProxyNetwork proxyNetwork;
-    HashMap<UUID,UUID> channelMap=new HashMap<>();//通道uuid 目标用户uuid
+    HashMap<UUID, UUID> channelMap = new HashMap<>();//通道uuid 目标用户uuid
+
+    String ip;
 
     public ProxyClient(LinkerClient linkerClient, ProxyNetwork proxyNetwork) {
         this.linkerClient = linkerClient;
         this.proxyNetwork = proxyNetwork;
+
         LinkerLogger.info("代理客户 初始化");
 
         clientBootstrap.group(group)
@@ -40,12 +43,19 @@ public class ProxyClient {
                 });
     }
 
+
+    public void setIp(String ip) {
+        if (ip == null)
+            ip = "";
+        this.ip = ip;
+    }
+
     public Channel connect(UUID from, int port, UUID uuid) {
         LinkerLogger.info("代理客户 连接" + uuid);
-        ChannelFuture channelFuture = clientBootstrap.connect("", port);
+        ChannelFuture channelFuture = clientBootstrap.connect(ip, port);
         channelFuture.addListener((ChannelFutureListener) future -> {
             if (future.isSuccess()) {
-                channelMap.put(uuid,from);
+                channelMap.put(uuid, from);
                 future.channel().attr(ProxyNetwork.CHANNEL_UUID_KEY).set(uuid);
                 proxyNetwork.channelMap.put(uuid, future.channel());
                 LinkerLogger.info("代理客户连接成功");

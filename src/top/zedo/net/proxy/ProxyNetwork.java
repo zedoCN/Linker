@@ -32,6 +32,10 @@ public class ProxyNetwork {
         proxyClient = new ProxyClient(linkerClient, this);
     }
 
+    public void setIp(String ip) {
+        proxyClient.setIp(ip);
+    }
+
     /**
      * 设置代理模式
      *
