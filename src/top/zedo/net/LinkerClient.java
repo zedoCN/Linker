@@ -37,14 +37,16 @@ public class LinkerClient {
         this.linkerClientEvent = linkerClientEvent;
         clientBootstrap.group(group)
                 .channel(NioSocketChannel.class)
-                .option(ChannelOption.SO_KEEPALIVE, true)//2097152
+                .option(ChannelOption.SO_KEEPALIVE, true)
+                .option(ChannelOption.SO_RCVBUF, 512 * 1024)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(131128, 0, 4, 0, 4));
+                        ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(100 * 1024 * 1024, 0, 4, 0, 4));
                         ch.pipeline().addLast(new ClientHandler());
                     }
                 });
+
     }
 
     public void setLinkerServerAddress(InetSocketAddress inetSocketAddress) {

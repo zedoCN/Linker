@@ -21,6 +21,13 @@ public class LinkerUser {
     public long totalDownBytes = 0; // 总下行字节数
     public long previousTotalUpBytes = 0; // 上一秒的总上行字节数
     public long previousTotalDownBytes = 0; // 上一秒的总下行字节数
+
+    public long upstreamPackets = 0; // 上行包流量
+    public long downstreamPackets = 0; // 下行包流量
+    public long totalUpstreamPackets=0;// 总上行包数
+    public long totalDownstreamPackets=0;// 总下行包数
+    public long previousTotalUpstreamPackets=0; // 上一秒的总上行包数
+    public long previousTotalDownstreamPackets=0;// 上一秒的总下行包数
     public long uuidMost = 0; // UUID最高有效位
     public long uuidLeast = 0; // UUID最低有效位
 
@@ -46,6 +53,15 @@ public class LinkerUser {
         // 计算下行流量
         downTraffic = totalDownBytes - previousTotalDownBytes;
         previousTotalDownBytes = totalDownBytes; // 更新上一秒的总上行字节数
+
+
+        // 计算上行流量
+        upstreamPackets = totalUpstreamPackets - previousTotalUpstreamPackets;
+        previousTotalUpstreamPackets = totalUpstreamPackets; // 更新上一秒的总上行字节数
+        // 计算下行流量
+        downstreamPackets = totalDownstreamPackets - previousTotalDownstreamPackets;
+        previousTotalDownstreamPackets = totalDownstreamPackets; // 更新上一秒的总上行字节数
+
     }
 
     @Override

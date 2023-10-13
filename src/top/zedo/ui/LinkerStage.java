@@ -25,7 +25,8 @@ import java.util.Properties;
 
 public class LinkerStage extends Stage {
     Properties properties = new Properties();
-
+    OneBox oneBox;
+    TwoBox twoBox;
     {
         try {
             LinkerLogger.info("载入配置");
@@ -33,6 +34,7 @@ public class LinkerStage extends Stage {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
     }
 
     LabelTextField nameTextField = new LabelTextField("你的昵称:");
@@ -55,8 +57,7 @@ public class LinkerStage extends Stage {
         header.setPadding(new Insets(8));
     }
 
-    OneBox oneBox = new OneBox(this);
-    TwoBox twoBox = new TwoBox(this);
+
     VBox body = new VBox();
 
     {
@@ -91,6 +92,9 @@ public class LinkerStage extends Stage {
     }
 
     public LinkerStage() {
+        oneBox = new OneBox(this);
+        twoBox = new TwoBox(this);
+
         /*setMaxWidth(600);
         setMaxHeight(400);*/
         setMinWidth(800);
@@ -167,6 +171,7 @@ public class LinkerStage extends Stage {
                     }
                 }
             }
+
         });
 
 

@@ -58,10 +58,11 @@ public class LinkerServer {
                         @Override
                         protected void initChannel(SocketChannel ch) {
                             ch.pipeline()
-                                    .addLast(new LengthFieldBasedFrameDecoder(131128, 0, 4, 0, 4))
+                                    .addLast(new LengthFieldBasedFrameDecoder(100 * 1024 * 1024, 0, 4, 0, 4))
                                     .addLast(new ServerHandler());
                         }
                     })
+                    .option(ChannelOption.SO_RCVBUF, 512 * 1024)
                     .option(ChannelOption.SO_KEEPALIVE, true);
 
             ChannelFuture cf = serverBootstrap.bind(serverPort).sync();
@@ -110,9 +111,13 @@ public class LinkerServer {
      * @param packet 数据包
      */
     private void sendPacket(LinkerUser user, BasePacket packet) {
+        Channel channel = userChannelMap.get(user.getUUID());
+        if (channel == null)
+            return;
         ByteBuf nettyByteBuf = Unpooled.wrappedBuffer(packet.buildPack());
         user.totalDownBytes += nettyByteBuf.capacity();//计算流量
-        userChannelMap.get(user.getUUID()).writeAndFlush(nettyByteBuf);
+        user.totalDownstreamPackets++;//计算流量
+        channel.writeAndFlush(nettyByteBuf);
     }
 
     /**
@@ -293,6 +298,7 @@ public class LinkerServer {
             if (linkerUser != null) {
                 BasePacket packet = BasePacket.resolved(((ByteBuf) msg).nioBuffer());
                 linkerUser.totalUpBytes += ((ByteBuf) msg).readableBytes();//计算流量
+                linkerUser.totalUpstreamPackets++;//计算流量
                 if (packet instanceof ChannelPacket channelPacket) {
                     handleChannelPacket(linkerUser, channelPacket);
                 } else if (packet instanceof JsonPacket jsonPacket) {
