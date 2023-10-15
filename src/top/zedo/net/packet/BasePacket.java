@@ -5,7 +5,7 @@ import java.nio.ByteBuffer;
 public abstract class BasePacket {
 
     public ByteBuffer buildPack() {
-        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(getDataSize() + 5);
+        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(getSize());
         byteBuffer.putInt(getDataSize() + 1);
         byteBuffer.put(getType().getMark());
         build(byteBuffer);
@@ -49,4 +49,8 @@ public abstract class BasePacket {
      * @return 包标识
      */
     protected abstract PacketType getType();
+
+    public int getSize() {
+        return getDataSize() + 5;
+    }
 }

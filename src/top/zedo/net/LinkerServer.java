@@ -54,16 +54,18 @@ public class LinkerServer {
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
+                    .option(ChannelOption.SO_RCVBUF, 8 * 1024 * 1024)
+                    .option(ChannelOption.SO_SNDBUF, 8 * 1024 * 1024)
+                    .option(ChannelOption.SO_KEEPALIVE, true)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) {
                             ch.pipeline()
-                                    .addLast(new LengthFieldBasedFrameDecoder(100 * 1024 * 1024, 0, 4, 0, 4))
+                                    .addLast(new LengthFieldBasedFrameDecoder(200 * 1024 * 1024, 0, 4, 0, 4))
                                     .addLast(new ServerHandler());
                         }
-                    })
-                    .option(ChannelOption.SO_RCVBUF, 512 * 1024)
-                    .option(ChannelOption.SO_KEEPALIVE, true);
+                    });
+
 
             ChannelFuture cf = serverBootstrap.bind(serverPort).sync();
             LinkerLogger.info("Linker服务器启动成功");

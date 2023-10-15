@@ -8,10 +8,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import top.zedo.LinkerLogger;
 import top.zedo.net.LinkerClient;
-import top.zedo.net.packet.ChannelPacket;
 
-import java.nio.ByteBuffer;
-import java.util.HashMap;
 import java.util.UUID;
 
 public class ProxyServer {
@@ -38,6 +35,7 @@ public class ProxyServer {
                 .channel(NioServerSocketChannel.class)
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 60000)
+                .option(ChannelOption.SO_RCVBUF, 20 * 1024 * 1024)
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) {
@@ -101,12 +99,9 @@ public class ProxyServer {
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
             UUID uuid = ctx.attr(ProxyNetwork.CHANNEL_UUID_KEY).get();//通道uuid
-            ChannelPacket channelPacket = new ChannelPacket(linkerClient.linkerUser.getUUID()
-                    , linkerClient.linkerGroup.host.getUUID()
-                    , uuid
-                    , ((ByteBuf) msg).nioBuffer());
-            linkerClient.sendChannelPacket(channelPacket);
-            ((ByteBuf) msg).release();//释放
+            ByteBuf byteBuf = ((ByteBuf) msg);
+            proxyNetwork.sendProxyData(uuid, byteBuf);
+            byteBuf.release();//释放
             //LinkerLogger.info("代理服务器转发" + channelPacket);
         }
 

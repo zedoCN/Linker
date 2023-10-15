@@ -27,6 +27,7 @@ public class LinkerStage extends Stage {
     Properties properties = new Properties();
     OneBox oneBox;
     TwoBox twoBox;
+
     {
         try {
             LinkerLogger.info("载入配置");
@@ -103,6 +104,7 @@ public class LinkerStage extends Stage {
         setHeight(400);
         setScene(scene);
 
+
         setOnCloseRequest(event -> System.exit(0));
 
         nameTextField.textField.setText(properties.getProperty("name"));
@@ -174,7 +176,7 @@ public class LinkerStage extends Stage {
 
         });
 
-
+        linkerClient.proxyNetwork.setFlushDelay(Integer.parseInt(properties.getProperty("flushDelay", "20")));
         linkerClient.setLinkerServerAddress(new InetSocketAddress(properties.getProperty("linkerServerIp"), Integer.parseInt(properties.getProperty("linkerServerPort"))));
 
         new Thread(() -> {

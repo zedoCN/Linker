@@ -1,7 +1,7 @@
 package top.zedo.net.packet;
 
 import java.nio.ByteBuffer;
-import java.util.UUID;
+import java.util.*;
 
 public class ChannelPacket extends BasePacket {
     public UUID fromUser;//来自用户的uuid
@@ -9,12 +9,18 @@ public class ChannelPacket extends BasePacket {
     public UUID uuid;//连接通道的uuid
     public ByteBuffer sourceData;//源数据
 
+
     public ChannelPacket(UUID fromUser, UUID toUser, UUID channelUUID, ByteBuffer sourceData) {
         this.fromUser = fromUser;
         this.toUser = toUser;
         this.uuid = channelUUID;
-        this.sourceData = sourceData;
+
+        this.sourceData = ByteBuffer.allocate(sourceData.capacity());
+        this.sourceData.put(sourceData);
+        sourceData.flip();
+        this.sourceData.flip();
     }
+
 
     /**
      * 通过原始包数据构建
@@ -22,36 +28,31 @@ public class ChannelPacket extends BasePacket {
      * @param packData 原始包数据
      */
     public ChannelPacket(ByteBuffer packData) {
-        // Read fromUser UUID
-        long fromMostSignificantBits = packData.getLong();
-        long fromLeastSignificantBits = packData.getLong();
-        fromUser = new UUID(fromMostSignificantBits, fromLeastSignificantBits);
+        try {
+            long fromMostSignificantBits = packData.getLong();
+            long fromLeastSignificantBits = packData.getLong();
+            fromUser = new UUID(fromMostSignificantBits, fromLeastSignificantBits);
 
-        // Read toUser UUID
-        long toMostSignificantBits = packData.getLong();
-        long toLeastSignificantBits = packData.getLong();
-        toUser = new UUID(toMostSignificantBits, toLeastSignificantBits);
+            long toMostSignificantBits = packData.getLong();
+            long toLeastSignificantBits = packData.getLong();
+            toUser = new UUID(toMostSignificantBits, toLeastSignificantBits);
 
-        // Read channel uuid
-        long uuidMostSignificantBits = packData.getLong();
-        long uuidLeastSignificantBits = packData.getLong();
-        uuid = new UUID(uuidMostSignificantBits, uuidLeastSignificantBits);
+            long uuidMostSignificantBits = packData.getLong();
+            long uuidLeastSignificantBits = packData.getLong();
+            uuid = new UUID(uuidMostSignificantBits, uuidLeastSignificantBits);
 
-        // Read sourceData
-
-
-        // Calculate the size of the data
-
-        sourceData = ByteBuffer.allocate(packData.remaining());
-        sourceData.put(packData);
-        sourceData.flip();
-        //sourceData = packData.slice();
+            sourceData = ByteBuffer.allocate(packData.remaining());
+            sourceData.put(packData);
+            sourceData.flip();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public String toString() {
         return "ChannelPacket{" +
-                "fromUser=" + fromUser +
+                ", fromUser=" + fromUser +
                 ", toUser=" + toUser +
                 ", uuid=" + uuid +
                 ", sourceDataSize=" + sourceData.limit() +
@@ -60,6 +61,7 @@ public class ChannelPacket extends BasePacket {
 
     @Override
     protected void build(ByteBuffer buffer) {
+
         // Write fromUser UUID
         buffer.putLong(fromUser.getMostSignificantBits());
         buffer.putLong(fromUser.getLeastSignificantBits());
@@ -76,7 +78,7 @@ public class ChannelPacket extends BasePacket {
 
     @Override
     protected int getDataSize() {
-        return 3 * 16 + sourceData.limit();
+        return 3 * 16 + sourceData.limit() ;
     }
 
     @Override

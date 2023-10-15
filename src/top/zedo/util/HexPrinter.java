@@ -7,7 +7,7 @@ public class HexPrinter {
         StringBuilder sb = new StringBuilder();
         int position = buffer.position();
         int limit = buffer.limit();
-        sb.append("ByteBuffer:").append(buffer).append("\n");
+        sb.append("ByteBuffer:").append(buffer).append(" -> ");
         for (int i = 0; i < limit; i++) {
             sb.append(String.format("%02X ", buffer.get(i)));
         }

@@ -38,15 +38,18 @@ public class LinkerClient {
         clientBootstrap.group(group)
                 .channel(NioSocketChannel.class)
                 .option(ChannelOption.SO_KEEPALIVE, true)
-                .option(ChannelOption.SO_RCVBUF, 512 * 1024)
+                .option(ChannelOption.SO_RCVBUF, 8 * 1024 * 1024)
+                .option(ChannelOption.SO_SNDBUF, 8 * 1024 * 1024)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(100 * 1024 * 1024, 0, 4, 0, 4));
+                        ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(200 * 1024 * 1024, 0, 4, 0, 4));
                         ch.pipeline().addLast(new ClientHandler());
                     }
                 });
 
+        // 启动定时器，定时检查是否需要发送
+        // scheduler.scheduleAtFixedRate(this::checkAndSendPackets, SEND_DELAY, SEND_DELAY, TimeUnit.MILLISECONDS);
     }
 
     public void setLinkerServerAddress(InetSocketAddress inetSocketAddress) {
@@ -120,14 +123,21 @@ public class LinkerClient {
         sendPacket(JsonPacket.buildCommandPacket(null, LinkerCommand.LEAVE_GROUP));
     }
 
+
     /**
      * 发送通道包
      *
-     * @param packet 包
      */
-    public void sendChannelPacket(ChannelPacket packet) {
-        sendPacket(packet);
+    public void sendChannelPacket(UUID uuid, UUID to, ByteBuf buffer) {
+        ChannelPacket channelPacket = new ChannelPacket(linkerUser.getUUID()
+                , to
+                , uuid
+                , buffer.nioBuffer()
+        );
+        //System.out.println(channelPacket);
+        sendPacket(channelPacket);
     }
+
 
     /**
      * 发送通道关闭事件
@@ -140,6 +150,7 @@ public class LinkerClient {
         json.put("to", to.toString());
         sendPacket(JsonPacket.buildEventPacket(json, LinkerEvent.CHANNEL_CLOSE));
     }
+
 
     /**
      * 向服务器发送数据包
@@ -200,6 +211,7 @@ public class LinkerClient {
         }
     }
 
+
     private class ClientHandler extends ChannelHandlerAdapter {
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
@@ -210,9 +222,7 @@ public class LinkerClient {
         @Override
         public void channelActive(ChannelHandlerContext ctx) throws Exception {
             LinkerLogger.info("连接" + ctx.channel());
-
             /*JSONObject jsonObject = new JSONObject();
-
             sendPacket(JsonPacket.buildCommandPacket(jsonObject, LinkerCommand.LOGIN));*/
         }
 

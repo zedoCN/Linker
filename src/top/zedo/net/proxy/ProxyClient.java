@@ -19,7 +19,7 @@ public class ProxyClient {
     Bootstrap clientBootstrap = new Bootstrap();
     LinkerClient linkerClient;
     ProxyNetwork proxyNetwork;
-    HashMap<UUID, UUID> channelMap = new HashMap<>();//通道uuid 目标用户uuid
+    public HashMap<UUID, UUID> channelMap = new HashMap<>();//通道uuid 目标用户uuid
 
     String ip;
 
@@ -34,6 +34,7 @@ public class ProxyClient {
                 //长连接
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 60000)
+                .option(ChannelOption.SO_RCVBUF, 20 * 1024 * 1024)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
@@ -82,9 +83,7 @@ public class ProxyClient {
         public void channelActive(ChannelHandlerContext ctx) throws Exception {
             UUID uuid = ctx.attr(ProxyNetwork.CHANNEL_UUID_KEY).get();//通道uuid
             UUID to = channelMap.get(uuid);//来源用户uuid
-            LinkerLogger.info("代理客户连接上了 来自" + to + " 通道UUID" + uuid);
-
-            LinkerLogger.info("连接" + ctx.channel());
+            LinkerLogger.info("代理客户连接上了 " + ctx.channel() + " 来自" + to + " 通道UUID" + uuid);
         }
 
         @Override
@@ -95,13 +94,17 @@ public class ProxyClient {
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
             UUID uuid = ctx.attr(ProxyNetwork.CHANNEL_UUID_KEY).get();//通道uuid
-            UUID to = channelMap.get(uuid);//来源用户uuid
+            //UUID to = channelMap.get(uuid);//来源用户uuid
             //LinkerLogger.info("代理客户收到数据 来自" + to + " 通道UUID" + uuid);
 
-            ChannelPacket channelPacket = new ChannelPacket(linkerClient.linkerUser.getUUID(), to, uuid, ((ByteBuf) msg).nioBuffer());
-            linkerClient.sendChannelPacket(channelPacket);
-            ((ByteBuf) msg).release();//释放
-            //LinkerLogger.info("代理客户转发" + channelPacket);
+
+            //ChannelPacket channelPacket = new ChannelPacket(linkerClient.linkerUser.getUUID(), to, uuid, ((ByteBuf) msg).nioBuffer());
+            ByteBuf byteBuf = ((ByteBuf) msg);
+            proxyNetwork.sendProxyData(uuid, byteBuf);
+            byteBuf.release();//释放
+
+            //((ByteBuf) msg).release();//释放
+            //LinkerLogger.info("代理客户转发 " + channelPacket);
 
 
         }

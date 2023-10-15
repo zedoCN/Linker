@@ -1,0 +1,28 @@
+[19:58:13] [Test$Server.<init>/INFO]: 服务器已关闭
+[19:58:13] [Test$Client$ClientHandler.channelActive/INFO]: 连接[id: 0x44d10c3b, /127.0.0.1:3815 => localhost/127.0.0.1:6789]
+[19:58:13] [ThreadGroup.uncaughtException/WARNING]: Exception in thread "Thread-0"
+[19:58:13] [Throwable$WrappedPrintStream.println/WARNING]: java.net.BindException: Address already in use: bind
+[19:58:13] [Throwable$WrappedPrintStream.println/WARNING]: at java.base/sun.nio.ch.Net.bind0(Native Method)
+[19:58:13] [Throwable$WrappedPrintStream.println/WARNING]: at java.base/sun.nio.ch.Net.bind(Net.java:565)
+[19:58:13] [Throwable$WrappedPrintStream.println/WARNING]: at java.base/sun.nio.ch.ServerSocketChannelImpl.netBind(ServerSocketChannelImpl.java:344)
+[19:58:13] [Throwable$WrappedPrintStream.println/WARNING]: at java.base/sun.nio.ch.ServerSocketChannelImpl.bind(ServerSocketChannelImpl.java:301)
+[19:58:13] [Throwable$WrappedPrintStream.println/WARNING]: at java.base/sun.nio.ch.ServerSocketAdaptor.bind(ServerSocketAdaptor.java:89)
+[19:58:13] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.socket.nio.NioServerSocketChannel.doBind(NioServerSocketChannel.java:125)
+[19:58:13] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.AbstractChannel$AbstractUnsafe.bind(AbstractChannel.java:554)
+[19:58:13] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.DefaultChannelPipeline$HeadContext.bind(DefaultChannelPipeline.java:1237)
+[19:58:13] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.ChannelHandlerInvokerUtil.invokeBindNow(ChannelHandlerInvokerUtil.java:109)
+[19:58:13] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.DefaultChannelHandlerInvoker.invokeBind(DefaultChannelHandlerInvoker.java:214)
+[19:58:13] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.PausableChannelEventExecutor.invokeBind(PausableChannelEventExecutor.java:101)
+[19:58:13] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.AbstractChannelHandlerContext.bind(AbstractChannelHandlerContext.java:481)
+[19:58:13] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.DefaultChannelPipeline.bind(DefaultChannelPipeline.java:1013)
+[19:58:13] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.AbstractChannel.bind(AbstractChannel.java:236)
+[19:58:13] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.bootstrap.AbstractBootstrap$2.run(AbstractBootstrap.java:357)
+[19:58:13] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.concurrent.SingleThreadEventExecutor.runAllTasks(SingleThreadEventExecutor.java:328)
+[19:58:13] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:354)
+[19:58:13] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.concurrent.SingleThreadEventExecutor$2.run(SingleThreadEventExecutor.java:116)
+[19:58:13] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinTask$RunnableExecuteAction.exec(ForkJoinTask.java:1412)
+[19:58:13] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinTask.doExec(ForkJoinTask.java:280)
+[19:58:13] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:877)
+[19:58:13] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinPool.scan(ForkJoinPool.java:1706)
+[19:58:13] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinPool.runWorker(ForkJoinPool.java:1661)
+[19:58:13] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:126)

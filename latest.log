@@ -1,46 +1,27 @@
-[15:51:06] [Main.runServer/INFO]: 载入配置
-[15:51:06] [LinkerServer.start/INFO]: Linker服务器初始化
-[15:51:06] [PlatformDependent.<clinit>/WARNING]: 信息: Your platform does not provide complete low-level API for accessing direct buffers reliably. Unless explicitly requested, heap buffer will always be preferred to avoid potential system unstability.
-[15:51:06] [LinkerServer.start/INFO]: Linker服务器启动成功
-[15:51:11] [LinkerServer$ServerHandler.channelActive/INFO]: 连接[id: 0xc2dc564d, /127.0.0.1:8423 => /127.0.0.1:5432]
-[15:51:13] [LinkerServer$ServerHandler.channelActive/INFO]: 连接[id: 0xef0a0076, /127.0.0.1:8428 => /127.0.0.1:5432]
-[15:51:26] [Throwable$WrappedPrintStream.println/WARNING]: java.net.SocketException: Connection reset
-[15:51:26] [Throwable$WrappedPrintStream.println/WARNING]: at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:401)
-[15:51:26] [Throwable$WrappedPrintStream.println/WARNING]: at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:434)
-[15:51:26] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.buffer.PooledHeapByteBuf.setBytes(PooledHeapByteBuf.java:234)
-[15:51:26] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:853)
-[15:51:26] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:240)
-[15:51:26] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:115)
-[15:51:26] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:514)
-[15:51:26] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.nio.NioEventLoop.processSelectedKeysPlain(NioEventLoop.java:433)
-[15:51:26] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:387)
-[15:51:26] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:351)
-[15:51:26] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.concurrent.SingleThreadEventExecutor$2.run(SingleThreadEventExecutor.java:116)
-[15:51:26] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinTask$RunnableExecuteAction.exec(ForkJoinTask.java:1412)
-[15:51:26] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinTask.doExec(ForkJoinTask.java:280)
-[15:51:26] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:877)
-[15:51:26] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinPool.scan(ForkJoinPool.java:1706)
-[15:51:26] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinPool.runWorker(ForkJoinPool.java:1661)
-[15:51:26] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:126)
-[15:51:26] [LinkerServer$ServerHandler.exceptionCaught/WARNING]: 连接异常Connection reset
-[15:51:26] [LinkerServer$ServerHandler.channelInactive/INFO]: 连接断开[id: 0xc2dc564d, /127.0.0.1:8423 :> /127.0.0.1:5432]
-[15:51:46] [Throwable$WrappedPrintStream.println/WARNING]: java.net.SocketException: Connection reset
-[15:51:46] [Throwable$WrappedPrintStream.println/WARNING]: at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:401)
-[15:51:46] [Throwable$WrappedPrintStream.println/WARNING]: at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:434)
-[15:51:46] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.buffer.PooledHeapByteBuf.setBytes(PooledHeapByteBuf.java:234)
-[15:51:46] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:853)
-[15:51:46] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:240)
-[15:51:46] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:115)
-[15:51:46] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:514)
-[15:51:46] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.nio.NioEventLoop.processSelectedKeysPlain(NioEventLoop.java:433)
-[15:51:46] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:387)
-[15:51:46] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:351)
-[15:51:46] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.concurrent.SingleThreadEventExecutor$2.run(SingleThreadEventExecutor.java:116)
-[15:51:46] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinTask$RunnableExecuteAction.exec(ForkJoinTask.java:1412)
-[15:51:46] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinTask.doExec(ForkJoinTask.java:280)
-[15:51:46] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:877)
-[15:51:46] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinPool.scan(ForkJoinPool.java:1706)
-[15:51:46] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinPool.runWorker(ForkJoinPool.java:1661)
-[15:51:46] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:126)
-[15:51:46] [LinkerServer$ServerHandler.exceptionCaught/WARNING]: 连接异常Connection reset
-[15:51:46] [LinkerServer$ServerHandler.channelInactive/INFO]: 连接断开[id: 0xef0a0076, /127.0.0.1:8428 :> /127.0.0.1:5432]
+[23:40:47] [Main.runServer/INFO]: 载入配置
+[23:40:47] [LinkerServer.start/INFO]: Linker服务器初始化
+[23:40:47] [PlatformDependent.<clinit>/WARNING]: 信息: Your platform does not provide complete low-level API for accessing direct buffers reliably. Unless explicitly requested, heap buffer will always be preferred to avoid potential system unstability.
+[23:40:47] [LinkerServer.start/INFO]: Linker服务器启动成功
+[23:40:51] [LinkerServer$ServerHandler.channelActive/INFO]: 连接[id: 0xaa52e1e4, /127.0.0.1:15005 => /127.0.0.1:5432]
+[23:40:53] [LinkerServer$ServerHandler.channelActive/INFO]: 连接[id: 0xb08945fd, /127.0.0.1:15010 => /127.0.0.1:5432]
+[23:40:53] [Throwable$WrappedPrintStream.println/WARNING]: java.net.SocketException: Connection reset
+[23:40:53] [Throwable$WrappedPrintStream.println/WARNING]: at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:401)
+[23:40:53] [Throwable$WrappedPrintStream.println/WARNING]: at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:434)
+[23:40:53] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.buffer.PooledHeapByteBuf.setBytes(PooledHeapByteBuf.java:234)
+[23:40:53] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:853)
+[23:40:53] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:240)
+[23:40:53] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:115)
+[23:40:53] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:514)
+[23:40:53] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.nio.NioEventLoop.processSelectedKeysPlain(NioEventLoop.java:433)
+[23:40:53] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:387)
+[23:40:53] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:351)
+[23:40:53] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.concurrent.SingleThreadEventExecutor$2.run(SingleThreadEventExecutor.java:116)
+[23:40:53] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinTask$RunnableExecuteAction.exec(ForkJoinTask.java:1412)
+[23:40:53] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinTask.doExec(ForkJoinTask.java:280)
+[23:40:53] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:877)
+[23:40:53] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinPool.scan(ForkJoinPool.java:1706)
+[23:40:53] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinPool.runWorker(ForkJoinPool.java:1661)
+[23:40:53] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:126)
+[23:40:53] [LinkerServer$ServerHandler.exceptionCaught/WARNING]: 连接异常Connection reset
+[23:40:53] [LinkerServer$ServerHandler.channelInactive/INFO]: 连接断开[id: 0xaa52e1e4, /127.0.0.1:15005 :> /127.0.0.1:5432]
+[23:40:55] [LinkerServer$ServerHandler.channelActive/INFO]: 连接[id: 0x38ef3874, /127.0.0.1:15015 => /127.0.0.1:5432]
