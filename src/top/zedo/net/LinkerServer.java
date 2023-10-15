@@ -91,6 +91,7 @@ public class LinkerServer {
         for (LinkerUser user : userMap.values()) {
             // 计算用户的流量
             user.calculateTraffic();
+            //user.channels=
             // 计算延迟
             JSONObject ping = new JSONObject();
             ping.put("sendTime", System.currentTimeMillis());
@@ -165,6 +166,9 @@ public class LinkerServer {
         JSONObject commandResult = new JSONObject();
         commandResult.put("command", command.name());
         switch (command) {
+            case UPLOAD_INFO -> {
+                user.channels = value.getIntValue("channels");
+            }
             case PING -> {
                 user.delay = (int) (System.currentTimeMillis() - value.getLongValue("sendTime"));
                 commandResult.put("success", true);
@@ -236,6 +240,10 @@ public class LinkerServer {
             LinkerUser to = userMap.get(packet.toUser);
             if (to == null) {//检查目标用户是否存在
                 LinkerLogger.warning("未知目标用户" + packet);
+                JSONObject json = new JSONObject();
+                json.put("uuid", packet.uuid.toString());
+                json.put("to", user.getUUID().toString());
+                sendPacket(user, JsonPacket.buildEventPacket(json, LinkerEvent.CHANNEL_CLOSE));
                 return;
             }
             //LinkerLogger.info("来源:" + user + " 转发数据包" + packet);

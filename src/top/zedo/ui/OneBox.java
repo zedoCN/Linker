@@ -34,6 +34,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -192,6 +193,42 @@ public class OneBox extends VBox {
         //bottom.setPadding(new Insets(8));
     }
 
+    public void rejoinGroup() {
+        String joinGroupName = stage.properties.getProperty("joinGroupName", "");
+        String mode = stage.properties.getProperty("previousMode", "");
+
+        if ("".equals(mode)) {
+            stage.setLinkerTitle("重连组 未配置");
+            return;
+        }
+        if ("User".equals(mode)) {
+            stage.setLinkerTitle("重连组 等待重连 " + joinGroupName);
+        }
+        if ("Host".equals(mode)) {
+            stage.setLinkerTitle("重连组 准备创建组 " + createGroupNameField.textField.getText());
+            stage.linkerClient.createGroup(createGroupNameField.textField.getText());
+            stage.setLinkerTitle("重连组 创建成功");
+            return;
+        }
+        for (Person c : groupMap.values()) {
+            if (joinGroupName.equals(c.getGroupName())) {
+               if ("User".equals(mode)) {
+                    joinGroupUUIDField.textField.setText(c.getGroupUUID());
+                    stage.linkerClient.joinGroup(c.getGroupUUID());
+                    stage.setLinkerTitle("重连组 加入成功");
+                }
+                return;
+            }
+        }
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        stage.setLinkerTitle("重连组 未找到");
+
+    }
+
     public OneBox(LinkerStage stage) {
         this.stage = stage;
         createGroupNameField.textField.setText(stage.properties.getProperty("groupName"));
@@ -240,16 +277,21 @@ public class OneBox extends VBox {
     {
         createGroupButton.setOnAction(event -> {
             stage.linkerClient.createGroup(createGroupNameField.textField.getText());
+            stage.properties.setProperty("previousMode", "Host");
+            stage.saveProperties();
         });
 
         joinGroupButton.setOnAction(event -> {
-
             stage.linkerClient.joinGroup(joinGroupUUIDField.textField.getText());
+            stage.properties.setProperty("previousMode", "User");
+            stage.saveProperties();
         });
 
         tableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 joinGroupUUIDField.textField.setText(newValue.getGroupUUID());
+                stage.properties.setProperty("joinGroupName", newValue.getGroupName());
+                stage.saveProperties();
             }
         });
     }

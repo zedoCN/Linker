@@ -1,16 +1,15 @@
 package top.zedo.ui;
 
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import top.zedo.LinkerLogger;
 import top.zedo.data.LinkerCommand;
 import top.zedo.net.LinkerClient;
@@ -22,6 +21,9 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class LinkerStage extends Stage {
     Properties properties = new Properties();
@@ -39,6 +41,10 @@ public class LinkerStage extends Stage {
     }
 
     LabelTextField nameTextField = new LabelTextField("你的昵称:");
+    CheckBox rejoinCheckBox = new CheckBox("重新连接组");
+
+    ScheduledExecutorService trafficCalculatorExecutor = Executors.newSingleThreadScheduledExecutor();
+
 
     protected void saveProperties() {
         try {
@@ -50,14 +56,33 @@ public class LinkerStage extends Stage {
     }
 
 
-    HBox header = new HBox(nameTextField);
+    HBox header = new HBox(nameTextField, rejoinCheckBox);
 
     {
         header.setAlignment(Pos.CENTER_LEFT);
-        header.setSpacing(8);
+        header.setSpacing(16);
         header.setPadding(new Insets(8));
+
+
+        rejoinCheckBox.setSelected(Boolean.parseBoolean(properties.getProperty("reJoinGroup", "false")));
+        rejoinCheckBox.setOnAction(event -> {
+            properties.setProperty("reJoinGroup", rejoinCheckBox.isSelected() + "");
+            saveProperties();
+        });
+        trafficCalculatorExecutor.scheduleAtFixedRate(this::rejoinGroup, 1, 5, TimeUnit.SECONDS);
     }
 
+
+    private void rejoinGroup() {
+
+        if (linkerClient.isConnected()) {
+            if (linkerClient.proxyNetwork.isOpen()) {
+
+            } else {
+                oneBox.rejoinGroup();
+            }
+        }
+    }
 
     VBox body = new VBox();
 
@@ -151,8 +176,13 @@ public class LinkerStage extends Stage {
                             if (object.getBooleanValue("success")) {
                                 changePane(false);
                                 linkerClient.proxyNetwork.setMode(false);
-                                linkerClient.proxyNetwork.start(Integer.parseInt(properties.getProperty("userPort")));
-                                setLinkerTitle("成功加入组");
+                                try {
+                                    linkerClient.proxyNetwork.start(Integer.parseInt(properties.getProperty("userPort")));
+                                    setLinkerTitle("成功加入组");
+                                } catch (Exception e) {
+                                    setLinkerTitle("无法加入组 " + e.getMessage());
+                                    linkerClient.proxyNetwork.close();
+                                }
                             } else {
                                 setLinkerTitle("无法加入组:" + object.getString("message"));
                                 LinkerLogger.warning("无法加入组:" + object.getString("message"));
@@ -162,9 +192,14 @@ public class LinkerStage extends Stage {
                             if (object.getBooleanValue("success")) {
                                 changePane(false);
                                 linkerClient.proxyNetwork.setMode(true);
-                                linkerClient.proxyNetwork.start(Integer.parseInt(properties.getProperty("hostPort")));
-                                linkerClient.proxyNetwork.setIp(properties.getProperty("hostIp"));
-                                setLinkerTitle("成功创建组");
+                                try {
+                                    linkerClient.proxyNetwork.start(Integer.parseInt(properties.getProperty("hostPort")));
+                                    linkerClient.proxyNetwork.setIp(properties.getProperty("hostIp"));
+                                    setLinkerTitle("成功创建组");
+                                } catch (Exception e) {
+                                    setLinkerTitle("无法创建组 " + e.getMessage());
+                                    linkerClient.proxyNetwork.close();
+                                }
                             } else {
                                 setLinkerTitle("无法创建组:" + object.getString("message"));
                                 LinkerLogger.warning("无法创建组:" + object.getString("message"));
@@ -192,6 +227,7 @@ public class LinkerStage extends Stage {
     }
 
     private void reconnect() {
+        linkerClient.proxyNetwork.close();
         changePane(true);
         new Thread(() -> {
             while (true) {

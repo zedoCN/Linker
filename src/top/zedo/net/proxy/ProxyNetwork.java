@@ -30,7 +30,7 @@ public class ProxyNetwork {
     private ScheduledFuture<?> scheduledFuture;
     ProxyServer proxyServer;
     ProxyClient proxyClient;
-    HashMap<UUID, Channel> channelMap = new HashMap<>();//连接表
+    public HashMap<UUID, Channel> channelMap = new HashMap<>();//连接表
     HashMap<UUID, ByteBuf> bufferMap = new HashMap<>();//缓冲区表
     private final Lock bufferLock = new ReentrantLock();
 
@@ -124,18 +124,26 @@ public class ProxyNetwork {
         }
     }
 
+    public boolean isOpen() {
+        return proxy;
+    }
+
     /**
      * 关闭代理
      */
     public void close() {
-        if (proxy) {
-            proxy = false;
+        System.out.println("关闭代理");
+        try {
             if (isHost) {//主机模式 关闭代理客户
-
+                for (Channel channel : proxyClient.proxyNetwork.channelMap.values()) {
+                    channel.close();
+                }
             } else {//用户模式 关闭代理服务器
                 proxyServer.close();
             }
+        } catch (Exception e) {
         }
+        proxy = false;
     }
 
 

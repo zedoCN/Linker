@@ -21,6 +21,9 @@ import top.zedo.net.proxy.ProxyNetwork;
 
 import java.net.InetSocketAddress;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class LinkerClient {
     EventLoopGroup group = new NioEventLoopGroup();
@@ -31,7 +34,7 @@ public class LinkerClient {
     public LinkerGroup linkerGroup;
     LinkerClientEvent linkerClientEvent;
     public ProxyNetwork proxyNetwork = new ProxyNetwork(this);
-
+    private final ScheduledExecutorService updateInfoScheduler = Executors.newScheduledThreadPool(1);
 
     public LinkerClient(LinkerClientEvent linkerClientEvent) {
         this.linkerClientEvent = linkerClientEvent;
@@ -50,6 +53,14 @@ public class LinkerClient {
 
         // 启动定时器，定时检查是否需要发送
         // scheduler.scheduleAtFixedRate(this::checkAndSendPackets, SEND_DELAY, SEND_DELAY, TimeUnit.MILLISECONDS);
+
+        updateInfoScheduler.scheduleAtFixedRate(this::updateInfo, 0, 1, TimeUnit.SECONDS);
+    }
+
+    public void updateInfo() {
+        JSONObject json = new JSONObject();
+        json.put("channels", proxyNetwork.channelMap.size());
+        sendPacket(JsonPacket.buildCommandPacket(json, LinkerCommand.UPLOAD_INFO));
     }
 
     public void setLinkerServerAddress(InetSocketAddress inetSocketAddress) {
@@ -61,6 +72,10 @@ public class LinkerClient {
      */
     public boolean connect() {
         linkerServerChannel = clientBootstrap.connect(LinkerServerAddress).awaitUninterruptibly().channel();
+        return linkerServerChannel.isActive();
+    }
+
+    public boolean isConnected() {
         return linkerServerChannel.isActive();
     }
 
@@ -126,12 +141,11 @@ public class LinkerClient {
 
     /**
      * 发送通道包
-     *
      */
-    public void sendChannelPacket(UUID uuid, UUID to, ByteBuf buffer) {
+    public void sendChannelPacket(UUID channelUUID, UUID to, ByteBuf buffer) {
         ChannelPacket channelPacket = new ChannelPacket(linkerUser.getUUID()
                 , to
-                , uuid
+                , channelUUID
                 , buffer.nioBuffer()
         );
         //System.out.println(channelPacket);

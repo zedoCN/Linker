@@ -39,6 +39,19 @@ public class TwoBox extends VBox {
         private final SimpleStringProperty downstreamPackets = new SimpleStringProperty();
         private final SimpleStringProperty totalUpstreamPackets = new SimpleStringProperty();
         private final SimpleStringProperty totalDownstreamPackets = new SimpleStringProperty();
+        private final SimpleStringProperty channels = new SimpleStringProperty();
+
+        public String getChannels() {
+            return channels.get();
+        }
+
+        public SimpleStringProperty channelsProperty() {
+            return channels;
+        }
+
+        public void setChannels(String channels) {
+            this.channels.set(channels);
+        }
 
         public String getUpstreamPackets() {
             return upstreamPackets.get();
@@ -193,7 +206,7 @@ public class TwoBox extends VBox {
     TableColumn<Person, String> nameCol = new TableColumn<>("昵称");
     TableColumn<Person, String> delayCol = new TableColumn<>("延迟");
     TableColumn<Person, String> ipAddressCol = new TableColumn<>("IP");
-    TableColumn<Person, String> loginTimeCol = new TableColumn<>("登录时间");
+    TableColumn<Person, String> loginTimeCol = new TableColumn<>("登录");
     TableColumn<Person, String> upTrafficCol = new TableColumn<>("上传");
     TableColumn<Person, String> downTrafficCol = new TableColumn<>("下载");
     TableColumn<Person, String> totalUpBytesCol = new TableColumn<>("总上传");
@@ -204,6 +217,7 @@ public class TwoBox extends VBox {
     TableColumn<Person, String> downstreamPacketsCol = new TableColumn<>("下载包");
     TableColumn<Person, String> totalUpstreamPacketsCol = new TableColumn<>("总上传包");
     TableColumn<Person, String> totalDownstreamPacketsCol = new TableColumn<>("总下载包");
+    TableColumn<Person, String> channelsCol = new TableColumn<>("通道");
 
     HBox colBox = new HBox();
 
@@ -238,6 +252,7 @@ public class TwoBox extends VBox {
         downstreamPacketsCol.setCellValueFactory(new PropertyValueFactory<>("downstreamPackets"));
         totalUpstreamPacketsCol.setCellValueFactory(new PropertyValueFactory<>("totalUpstreamPackets"));
         totalDownstreamPacketsCol.setCellValueFactory(new PropertyValueFactory<>("totalDownstreamPackets"));
+        channelsCol.setCellValueFactory(new PropertyValueFactory<>("channels"));
         nameCol.setPrefWidth(140);
         delayCol.setPrefWidth(60);
         ipAddressCol.setPrefWidth(120);
@@ -250,6 +265,7 @@ public class TwoBox extends VBox {
         downstreamPacketsCol.setPrefWidth(100);
         totalUpstreamPacketsCol.setPrefWidth(100);
         totalDownstreamPacketsCol.setPrefWidth(100);
+        channelsCol.setPrefWidth(60);
 
 
         nameCol.setMinWidth(140);
@@ -264,7 +280,7 @@ public class TwoBox extends VBox {
         downstreamPacketsCol.setMinWidth(60);
         totalUpstreamPacketsCol.setMinWidth(60);
         totalDownstreamPacketsCol.setMinWidth(60);
-
+        channelsCol.setMinWidth(60);
 
         // 设置单元格内容居中对齐
         Callback<TableColumn<Person, String>, TableCell<Person, String>> cellFactory = col -> new TableCell<>() {
@@ -293,8 +309,10 @@ public class TwoBox extends VBox {
         totalUpstreamPacketsCol.setCellFactory(cellFactory);
         totalDownstreamPacketsCol.setCellFactory(cellFactory);
 
+        channelsCol.setCellFactory(cellFactory);
+
         tableView.getColumns().addAll(nameCol, delayCol, ipAddressCol, loginTimeCol, upTrafficCol, downTrafficCol, totalUpBytesCol, totalDownBytesCol,
-                upstreamPacketsCol, downstreamPacketsCol, totalUpstreamPacketsCol, totalDownstreamPacketsCol);
+                upstreamPacketsCol, downstreamPacketsCol, totalUpstreamPacketsCol, totalDownstreamPacketsCol, channelsCol);
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
 
@@ -355,6 +373,8 @@ public class TwoBox extends VBox {
             stage.linkerClient.leaveGroup();
             stage.changePane(true);
             stage.linkerClient.proxyNetwork.close();
+            stage.properties.setProperty("previousMode", "");
+            stage.saveProperties();
         });
         for (TableColumn<Person, ?> column : tableView.getColumns()) {
             column.setVisible("true".contains(stage.properties.getProperty(column.getText(), "true")));
@@ -390,6 +410,8 @@ public class TwoBox extends VBox {
                     person.setDownstreamPackets(ByteFormatter.formatPackets(user.downstreamPackets) + "/s");
                     person.setTotalUpstreamPackets(ByteFormatter.formatPackets(user.totalUpstreamPackets));
                     person.setTotalDownstreamPackets(ByteFormatter.formatPackets(user.totalDownstreamPackets));
+
+                    person.setChannels(ByteFormatter.formatPackets(user.channels) + "个");
 
                     removed.remove(user.getUUID());
                 }

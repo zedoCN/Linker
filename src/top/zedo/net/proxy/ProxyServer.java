@@ -61,9 +61,11 @@ public class ProxyServer {
      * 关闭代理服务器
      */
     public void close() {
-        bossGroup.shutdownGracefully();
-        workerGroup.shutdownGracefully();
-        LinkerLogger.info("代理服务器关闭");
+        if (bossGroup != null)
+            bossGroup.shutdownGracefully();
+        if (workerGroup != null)
+            workerGroup.shutdownGracefully();
+
     }
 
     public class ProxyServerHandler extends ChannelHandlerAdapter {

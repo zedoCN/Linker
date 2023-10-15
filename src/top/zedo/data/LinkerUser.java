@@ -31,6 +31,8 @@ public class LinkerUser {
     public long uuidMost = 0; // UUID最高有效位
     public long uuidLeast = 0; // UUID最低有效位
 
+    public int channels=0; //通道数
+
     public UUID getUUID() {
         if (uuid == null)
             uuid = new UUID(uuidMost, uuidLeast);
@@ -61,7 +63,6 @@ public class LinkerUser {
         // 计算下行流量
         downstreamPackets = totalDownstreamPackets - previousTotalDownstreamPackets;
         previousTotalDownstreamPackets = totalDownstreamPackets; // 更新上一秒的总上行字节数
-
     }
 
     @Override

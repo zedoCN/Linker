@@ -11,5 +11,5 @@ public enum LinkerCommand {
     GET_GROUPS,//获取组列表
     JOIN_GROUP,//加入组
     LEAVE_GROUP,//离开组
-
+    UPLOAD_INFO//上传信息
 }

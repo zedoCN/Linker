@@ -1,20 +1,50 @@
-[03:05:16] [Main.runClient/INFO]: 初始化图形系统
-[03:05:16] [LinkerStage.<init>/INFO]: 载入配置
-[03:05:16] [PlatformDependent.<clinit>/WARNING]: 信息: Your platform does not provide complete low-level API for accessing direct buffers reliably. Unless explicitly requested, heap buffer will always be preferred to avoid potential system unstability.
-[03:05:17] [ProxyClient.<init>/INFO]: 代理客户 初始化
-[03:05:17] [Main.lambda$runClient$0/INFO]: 显示Linker窗口
-[03:05:17] [LinkerClient$ClientHandler.channelActive/INFO]: 连接[id: 0x6aef441a, /127.0.0.1:2644 => /127.0.0.1:5432]
-[03:05:17] [LinkerClient.handleEvent/INFO]: 连接成功
-[03:05:18] [ProxyNetwork.setMode/INFO]: 设置代理模式为主机模式 启动代理客户
-[03:05:26] [ProxyClient.connect/INFO]: 代理客户 连接ee1095f9-0c99-4307-9390-f4de9ec4b434
-[03:05:26] [ProxyClient.lambda$connect$0/INFO]: 代理客户连接成功
-[03:05:26] [ProxyClient$ProxyClientHandler.channelActive/INFO]: 代理客户连接上了 [id: 0x3cec5dc1, /127.0.0.1:2669 => localhost/127.0.0.1:25565] 来自e7ee9852-9c97-4017-9e0f-d10673f8d52a 通道UUIDee1095f9-0c99-4307-9390-f4de9ec4b434
-[03:05:26] [ProxyClient$ProxyClientHandler.channelInactive/INFO]: 连接断开[id: 0x3cec5dc1, /127.0.0.1:2669 :> localhost/127.0.0.1:25565]
-[03:05:27] [ProxyNetwork.closeChannel/INFO]: 远程请求 断开连接[id: 0x3cec5dc1, /127.0.0.1:2669 :> localhost/127.0.0.1:25565]
-[03:05:27] [LinkerClient.handleEvent/INFO]: 事件: 断开连接{"uuid":"ee1095f9-0c99-4307-9390-f4de9ec4b434","to":"cd3955d6-c2ce-4a0b-b818-6fb2fef47992"}
-[03:05:29] [ProxyClient.connect/INFO]: 代理客户 连接43f06b7a-32e0-4a7b-8e3d-8da12205279a
-[03:05:29] [ProxyClient.lambda$connect$0/INFO]: 代理客户连接成功
-[03:05:29] [ProxyClient$ProxyClientHandler.channelActive/INFO]: 代理客户连接上了 [id: 0x83d16a89, /127.0.0.1:2679 => localhost/127.0.0.1:25565] 来自e7ee9852-9c97-4017-9e0f-d10673f8d52a 通道UUID43f06b7a-32e0-4a7b-8e3d-8da12205279a
-[03:07:29] [ProxyNetwork.closeChannel/INFO]: 远程请求 断开连接[id: 0x83d16a89, /127.0.0.1:2679 => localhost/127.0.0.1:25565]
-[03:07:29] [LinkerClient.handleEvent/INFO]: 事件: 断开连接{"uuid":"43f06b7a-32e0-4a7b-8e3d-8da12205279a","to":"cd3955d6-c2ce-4a0b-b818-6fb2fef47992"}
-[03:07:29] [ProxyClient$ProxyClientHandler.channelInactive/INFO]: 连接断开[id: 0x83d16a89, /127.0.0.1:2679 :> localhost/127.0.0.1:25565]
+[04:59:41] [Main.runClient/INFO]: 初始化图形系统
+[04:59:42] [LinkerStage.<init>/INFO]: 载入配置
+[04:59:42] [PlatformDependent.<clinit>/WARNING]: 信息: Your platform does not provide complete low-level API for accessing direct buffers reliably. Unless explicitly requested, heap buffer will always be preferred to avoid potential system unstability.
+[04:59:42] [ProxyClient.<init>/INFO]: 代理客户 初始化
+[04:59:42] [Main.lambda$runClient$0/INFO]: 显示Linker窗口
+[04:59:42] [LinkerClient$ClientHandler.channelActive/INFO]: 连接[id: 0xe6aab02d, /192.168.1.120:13583 => /192.168.1.120:5432]
+[04:59:42] [LinkerClient.handleEvent/INFO]: 连接成功
+[04:59:43] [ProxyNetwork.setMode/INFO]: 设置代理模式为主机模式 启动代理客户
+[04:59:48] [ProxyNetwork.close/INFO]: 关闭代理
+[04:59:48] [LinkerStage.saveProperties/INFO]: 保存配置
+[04:59:48] [ProxyNetwork.close/INFO]: 关闭代理
+[04:59:49] [LinkerStage.saveProperties/INFO]: 保存配置
+[04:59:50] [LinkerStage.saveProperties/INFO]: 保存配置
+[04:59:50] [ProxyNetwork.close/INFO]: 关闭代理
+[04:59:50] [ProxyNetwork.setMode/INFO]: 设置代理模式为用户模式 启动代理服务器
+[04:59:50] [ProxyServer.start/INFO]: 代理服务器初始化
+[04:59:50] [ProxyServer.lambda$start$0/INFO]: 代理服务器启动成功
+[04:59:53] [ProxyServer$ProxyServerHandler.channelActive/INFO]: 连接[id: 0x4700779a, /127.0.0.1:13587 => /127.0.0.1:6543]
+[04:59:53] [ProxyServer$ProxyServerHandler.channelInactive/INFO]: 连接断开[id: 0x4700779a, /127.0.0.1:13587 :> /127.0.0.1:6543]
+[04:59:54] [ProxyServer$ProxyServerHandler.channelActive/INFO]: 连接[id: 0x504b3b2b, /127.0.0.1:13592 => /127.0.0.1:6543]
+[05:00:11] [Throwable$WrappedPrintStream.println/WARNING]: java.net.SocketException: Connection reset
+[05:00:11] [Throwable$WrappedPrintStream.println/WARNING]: at java.base/sun.nio.ch.SocketChannelImpl.throwConnectionReset(SocketChannelImpl.java:401)
+[05:00:11] [Throwable$WrappedPrintStream.println/WARNING]: at java.base/sun.nio.ch.SocketChannelImpl.read(SocketChannelImpl.java:434)
+[05:00:11] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.buffer.PooledHeapByteBuf.setBytes(PooledHeapByteBuf.java:234)
+[05:00:11] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.buffer.AbstractByteBuf.writeBytes(AbstractByteBuf.java:853)
+[05:00:11] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.socket.nio.NioSocketChannel.doReadBytes(NioSocketChannel.java:240)
+[05:00:11] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.nio.AbstractNioByteChannel$NioByteUnsafe.read(AbstractNioByteChannel.java:115)
+[05:00:11] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:514)
+[05:00:11] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.nio.NioEventLoop.processSelectedKeysPlain(NioEventLoop.java:433)
+[05:00:11] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:387)
+[05:00:11] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:351)
+[05:00:11] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.concurrent.SingleThreadEventExecutor$2.run(SingleThreadEventExecutor.java:116)
+[05:00:11] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinTask$RunnableExecuteAction.exec(ForkJoinTask.java:1412)
+[05:00:11] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinTask.doExec(ForkJoinTask.java:280)
+[05:00:11] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:877)
+[05:00:11] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinPool.scan(ForkJoinPool.java:1706)
+[05:00:11] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinPool.runWorker(ForkJoinPool.java:1661)
+[05:00:11] [Throwable$WrappedPrintStream.println/WARNING]: at io.netty.util.internal.chmv8.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:126)
+[05:00:11] [LinkerClient$ClientHandler.exceptionCaught/WARNING]: 连接异常Connection reset
+[05:00:11] [ProxyNetwork.close/INFO]: 关闭代理
+[05:00:11] [ProxyServer$ProxyServerHandler.channelInactive/INFO]: 连接断开[id: 0x504b3b2b, /127.0.0.1:13592 :> /127.0.0.1:6543]
+[05:00:11] [LinkerClient$ClientHandler.channelInactive/INFO]: 连接断开[id: 0xe6aab02d, /192.168.1.120:13583 :> /192.168.1.120:5432]
+[05:00:16] [LinkerClient$ClientHandler.channelActive/INFO]: 连接[id: 0x5a629172, /192.168.1.120:13611 => /192.168.1.120:5432]
+[05:00:16] [LinkerClient.handleEvent/INFO]: 连接成功
+[05:00:23] [ProxyNetwork.setMode/INFO]: 设置代理模式为用户模式 启动代理服务器
+[05:00:23] [ProxyServer.start/INFO]: 代理服务器初始化
+[05:00:23] [ProxyServer.lambda$start$0/INFO]: 代理服务器启动成功
+[05:00:24] [ProxyServer$ProxyServerHandler.channelActive/INFO]: 连接[id: 0x7fe9c992, /127.0.0.1:13620 => /127.0.0.1:6543]
+[05:00:24] [ProxyServer$ProxyServerHandler.channelInactive/INFO]: 连接断开[id: 0x7fe9c992, /127.0.0.1:13620 :> /127.0.0.1:6543]
+[05:00:25] [ProxyServer$ProxyServerHandler.channelActive/INFO]: 连接[id: 0xc53b4e9d, /127.0.0.1:13623 => /127.0.0.1:6543]
