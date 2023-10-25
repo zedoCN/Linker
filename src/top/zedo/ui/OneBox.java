@@ -194,38 +194,27 @@ public class OneBox extends VBox {
     }
 
     public void rejoinGroup() {
-        String joinGroupName = stage.properties.getProperty("joinGroupName", "");
+
         String mode = stage.properties.getProperty("previousMode", "");
 
-        if ("".equals(mode)) {
-            stage.setLinkerTitle("重连组 未配置");
-            return;
-        }
         if ("User".equals(mode)) {
-            stage.setLinkerTitle("重连组 等待重连 " + joinGroupName);
-        }
-        if ("Host".equals(mode)) {
-            stage.setLinkerTitle("重连组 准备创建组 " + createGroupNameField.textField.getText());
-            stage.linkerClient.createGroup(createGroupNameField.textField.getText());
-            stage.setLinkerTitle("重连组 创建成功");
-            return;
-        }
-        for (Person c : groupMap.values()) {
-            if (joinGroupName.equals(c.getGroupName())) {
-               if ("User".equals(mode)) {
+            String joinGroupName = stage.properties.getProperty("joinGroupName", "");
+            for (Person c : data) {
+                if (joinGroupName.equals(c.getGroupName())) {
                     joinGroupUUIDField.textField.setText(c.getGroupUUID());
                     stage.linkerClient.joinGroup(c.getGroupUUID());
-                    stage.setLinkerTitle("重连组 加入成功");
+                    stage.setLinkerTitle("重连组 加入成功 " + joinGroupName);
+                    return;
                 }
-                return;
             }
+            stage.setLinkerTitle("重连组 未找到 " + joinGroupName);
+        } else if ("Host".equals(mode)) {
+            String groupName = createGroupNameField.textField.getText();
+            stage.setLinkerTitle("重连组 创建组 " + groupName);
+            stage.linkerClient.createGroup(groupName);
+        } else {
+            stage.setLinkerTitle("重连组 未配置");
         }
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        stage.setLinkerTitle("重连组 未找到");
 
     }
 
@@ -279,12 +268,16 @@ public class OneBox extends VBox {
             stage.linkerClient.createGroup(createGroupNameField.textField.getText());
             stage.properties.setProperty("previousMode", "Host");
             stage.saveProperties();
+            data.removeAll();
+            groupMap.clear();
         });
 
         joinGroupButton.setOnAction(event -> {
             stage.linkerClient.joinGroup(joinGroupUUIDField.textField.getText());
             stage.properties.setProperty("previousMode", "User");
             stage.saveProperties();
+            data.removeAll();
+            groupMap.clear();
         });
 
         tableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -298,6 +291,8 @@ public class OneBox extends VBox {
 
     public LinkerClient.LinkerClientEvent handleEvent = (linkerUser, event, object) -> {
         switch (event) {
+            case HOST_DISSOLVE_GROUP -> {
+            }
             case USER_GET_START -> {
                 Platform.runLater(() -> {
 

@@ -34,7 +34,6 @@ public class LinkerClient {
     public LinkerGroup linkerGroup;
     LinkerClientEvent linkerClientEvent;
     public ProxyNetwork proxyNetwork = new ProxyNetwork(this);
-    private final ScheduledExecutorService updateInfoScheduler = Executors.newScheduledThreadPool(1);
 
     public LinkerClient(LinkerClientEvent linkerClientEvent) {
         this.linkerClientEvent = linkerClientEvent;
@@ -54,7 +53,8 @@ public class LinkerClient {
         // 启动定时器，定时检查是否需要发送
         // scheduler.scheduleAtFixedRate(this::checkAndSendPackets, SEND_DELAY, SEND_DELAY, TimeUnit.MILLISECONDS);
 
-        updateInfoScheduler.scheduleAtFixedRate(this::updateInfo, 0, 1, TimeUnit.SECONDS);
+        ScheduledExecutorService updateInfoScheduler = Executors.newScheduledThreadPool(1);
+        updateInfoScheduler.scheduleAtFixedRate(this::updateInfo, 0, 4, TimeUnit.SECONDS);
     }
 
     public void updateInfo() {
