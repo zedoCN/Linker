@@ -154,6 +154,7 @@ public class OneBox extends VBox {
     LabelTextField joinGroupPortField = new LabelTextField("开放端口:");
     LabelTextField joinGroupUUIDField = new LabelTextField("选择组(UUID):");
 
+
     {
         createGroupButton.setMaxWidth(Double.MAX_VALUE);
         joinGroupButton.setMaxWidth(Double.MAX_VALUE);
@@ -268,31 +269,25 @@ public class OneBox extends VBox {
             stage.linkerClient.createGroup(createGroupNameField.textField.getText());
             stage.properties.setProperty("previousMode", "Host");
             stage.saveProperties();
-            data.removeAll();
-            groupMap.clear();
         });
 
         joinGroupButton.setOnAction(event -> {
             stage.linkerClient.joinGroup(joinGroupUUIDField.textField.getText());
             stage.properties.setProperty("previousMode", "User");
+            Person p = groupMap.get(UUID.fromString(joinGroupUUIDField.textField.getText()));
+            stage.properties.setProperty("joinGroupName", p.getGroupName());
             stage.saveProperties();
-            data.removeAll();
-            groupMap.clear();
         });
 
         tableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 joinGroupUUIDField.textField.setText(newValue.getGroupUUID());
-                stage.properties.setProperty("joinGroupName", newValue.getGroupName());
-                stage.saveProperties();
             }
         });
     }
 
     public LinkerClient.LinkerClientEvent handleEvent = (linkerUser, event, object) -> {
         switch (event) {
-            case HOST_DISSOLVE_GROUP -> {
-            }
             case USER_GET_START -> {
                 Platform.runLater(() -> {
 

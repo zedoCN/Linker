@@ -262,8 +262,12 @@ public class LinkerStage extends Stage {
         Platform.runLater(() -> {
             body.getChildren().clear();
             if (isOne) {
+                oneBox.data.clear();
+                oneBox.groupMap.clear();
                 body.getChildren().add(oneBox);
             } else {
+                twoBox.data.clear();
+                twoBox.userMap.clear();
                 body.getChildren().add(twoBox);
             }
         });
